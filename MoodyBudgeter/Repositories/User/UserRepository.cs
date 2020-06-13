@@ -99,7 +99,7 @@ namespace MoodyBudgeter.Repositories.User
             });
         }
 
-        public IQueryable<UserSearch> SearchByUsername(string searchText, SearchOperator searchOperator, bool includePhoto)
+        public IQueryable<UserSearchResponse> SearchByUsername(string searchText, SearchOperator searchOperator, bool includePhoto)
         {
             IQueryable<BudgetUser> query;
             switch (searchOperator)
@@ -119,7 +119,7 @@ namespace MoodyBudgeter.Repositories.User
 
             var displayNameDefinitionId = Uow.DbContext.ProfilePropertyDefinition.FirstOrDefault(p => p.PropertyName == "DisplayName")?.PropertyDefinitionId;
 
-            IQueryable<UserSearch> searchQueryable;
+            IQueryable<UserSearchResponse> searchQueryable;
             if (!includePhoto)
             {
                 searchQueryable = from match in query
@@ -127,7 +127,7 @@ namespace MoodyBudgeter.Repositories.User
                                           up.PropertyDefinitionId == displayNameDefinitionId &&
                                           up.UserId == match.UserId)
                                       .DefaultIfEmpty()
-                                  select new UserSearch
+                                  select new UserSearchResponse
                                   {
                                       UserId = match.UserId,
                                       DisplayName = displayNameUserProfile.PropertyValue,
@@ -146,7 +146,7 @@ namespace MoodyBudgeter.Repositories.User
                                           up.PropertyDefinitionId == avatarDefinitionId &&
                                           up.UserId == match.UserId)
                                       .DefaultIfEmpty()
-                                  select new UserSearch
+                                  select new UserSearchResponse
                                   {
                                       UserId = match.UserId,
                                       Avatar = avatarUserProfile.PropertyValue,

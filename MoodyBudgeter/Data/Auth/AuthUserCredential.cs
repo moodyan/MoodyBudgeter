@@ -24,4 +24,3 @@ namespace MoodyBudgeter.Data.Auth
         public ICollection<AuthUserSecurityRole> UserSecurityRole { get; set; }
     }
 }
-}

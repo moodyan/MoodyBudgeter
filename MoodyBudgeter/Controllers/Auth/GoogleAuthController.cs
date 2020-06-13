@@ -1,4 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using MoodyBudgeter.Logic.Auth.Google;
+using MoodyBudgeter.Models.Auth.Google;
+using MoodyBudgeter.Models.Exceptions;
+using MoodyBudgeter.Utility.Clients.EnvironmentRequester;
+using MoodyBudgeter.Utility.Clients.GoogleAuth;
+using MoodyBudgeter.Utility.Clients.RestRequester;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,14 +17,14 @@ namespace MoodyBudgeter.Controllers
     public class GoogleAuthController : ControllerBase
     {
         private readonly IGoogleOAuthClient GoogleOAuthClient;
+        private readonly IRestRequester RestRequester;
+        private readonly IEnvironmentRequester EnvironmentRequester;
 
-        public GoogleAuthController(IGoogleOAuthClient googleOAuthClient, ILoyaltyRequester loyaltyRequester, IRestRequester restRequester, IEnvironmentRequester environmentRequester, IConfigurationRequester configurationRequester)
+        public GoogleAuthController(IGoogleOAuthClient googleOAuthClient, IRestRequester restRequester, IEnvironmentRequester environmentRequester)
         {
             GoogleOAuthClient = googleOAuthClient;
-            LoyaltyRequester = loyaltyRequester;
             RestRequester = restRequester;
             EnvironmentRequester = environmentRequester;
-            ConfigurationRequester = configurationRequester;
         }
 
         /// <summary>
@@ -29,7 +36,7 @@ namespace MoodyBudgeter.Controllers
         /// <param name="ssoRequest">The SSO Request body</param>
         /// <returns></returns>
         [HttpPost, Route("login")]
-        public async Task<GoogleSSOResponse> Login([FromBody] SSORequest ssoRequest)
+        public async Task<GoogleSSOResponse> Login([FromBody] GoogleSSORequest ssoRequest)
         {
             CheckNullBody(ssoRequest);
 
@@ -38,11 +45,11 @@ namespace MoodyBudgeter.Controllers
                 throw new CallerException("Google Client Id and Authorization Code are required.");
             }
 
-            SSOLogic ssoLogic = new SSOLogic(GoogleOAuthClient, LoyaltyRequester, RestRequester, EnvironmentRequester, ConfigurationRequester);
+            GoogleSSOLogic ssoLogic = new GoogleSSOLogic(GoogleOAuthClient, RestRequester, EnvironmentRequester);
 
-            GoogleTokenResponse tokenResponse = await ssoLogic.VerifyAuthCode(ssoRequest, PortalId);
+            GoogleTokenResponse tokenResponse = await ssoLogic.VerifyAuthCode(ssoRequest);
 
-            return await ssoLogic.LoginOrRegisterGoogleUser(tokenResponse, PortalId);
+            return await ssoLogic.LoginOrRegisterGoogleUser(tokenResponse);
         }
     }
 }

@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace MoodyBudgeter.Models.User.Search
+﻿namespace MoodyBudgeter.Models.User.Search
 {
     public class UserSearch
     {
-        public int UserId { get; set; }
-        public string DisplayName { get; set; }
-        public string Avatar { get; set; }
-        public string SearchFieldValue { get; set; }
+        public string SearchText { get; set; }
+        public string ProfilePropertyName { get; set; }
+        public int? ProfilePropertyId { get; set; }
+        public bool SearchUsername { get; set; }
+        public bool SearchSubAccounts { get; set; }
+        public SearchOperator Operator { get; set; }
+        public int PageSize { get; set; }
+        public int PageOffset { get; set; }
+        public bool SortAscending { get; set; }
+        public string SortField { get; set; }
+        public bool IsAdmin { get; set; }
+        public bool IncludeAvatar { get; set; }
     }
 }

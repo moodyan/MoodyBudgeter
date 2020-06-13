@@ -100,7 +100,7 @@ namespace MoodyBudgeter.Repositories.User
             });
         }
 
-        public IQueryable<UserSearch> SearchByPropertyValue(string searchText, int propertyId, SearchOperator searchOperator, bool includePhoto)
+        public IQueryable<UserSearchResponse> SearchByPropertyValue(string searchText, int propertyId, SearchOperator searchOperator, bool includePhoto)
         {
             var query = GetAll().Where(p => p.ProfilePropertyId == propertyId);
 
@@ -121,7 +121,7 @@ namespace MoodyBudgeter.Repositories.User
 
             var displayNameDefinitionId = Uow.DbContext.ProfilePropertyDefinition.FirstOrDefault(p => p.PropertyName == "DisplayName")?.PropertyDefinitionId;
 
-            IQueryable<UserSearch> searchQueryable;
+            IQueryable<UserSearchResponse> searchQueryable;
 
             if (!includePhoto)
             {
@@ -130,7 +130,7 @@ namespace MoodyBudgeter.Repositories.User
                                           up.PropertyDefinitionId == displayNameDefinitionId &&
                                           up.UserId == match.UserId)
                                       .DefaultIfEmpty()
-                                  select new UserSearch
+                                  select new UserSearchResponse
                                   {
                                       UserId = match.UserId,
                                       DisplayName = displayNameUserProfile.PropertyValue,
@@ -149,7 +149,7 @@ namespace MoodyBudgeter.Repositories.User
                                           up.PropertyDefinitionId == avatarDefinitionId &&
                                           up.UserId == match.UserId)
                                       .DefaultIfEmpty()
-                                  select new UserSearch
+                                  select new UserSearchResponse
                                   {
                                       UserId = match.UserId,
                                       Avatar = avatarUserProfile.PropertyValue,
@@ -161,7 +161,7 @@ namespace MoodyBudgeter.Repositories.User
             return searchQueryable;
         }
 
-        public IQueryable<UserSearch> AddSearchResponseInfo(IQueryable<UserSearch> searchQuery, bool includePhoto)
+        public IQueryable<UserSearchResponse> AddSearchResponseInfo(IQueryable<UserSearchResponse> searchQuery, bool includePhoto)
         {
             var displayNameDefinitionId = Uow.DbContext.ProfilePropertyDefinition.FirstOrDefault(p => p.PropertyName == "DisplayName")?.PropertyDefinitionId;
 
@@ -170,7 +170,7 @@ namespace MoodyBudgeter.Repositories.User
                                           up.PropertyDefinitionId == displayNameDefinitionId &&
                                           up.UserId == match.UserId)
                                       .DefaultIfEmpty()
-                                  select new UserSearch
+                                  select new UserSearchResponse
                                   {
                                       UserId = match.UserId,
                                       DisplayName = displayNameUserProfile.PropertyValue,
@@ -185,7 +185,7 @@ namespace MoodyBudgeter.Repositories.User
                                           up.PropertyDefinitionId == avatarDefinitionId &&
                                           up.UserId == match.UserId)
                                       .DefaultIfEmpty()
-                                  select new UserSearch
+                                  select new UserSearchResponse
                                   {
                                       UserId = match.UserId,
                                       Avatar = avatarUserProfile.PropertyValue,
@@ -202,7 +202,7 @@ namespace MoodyBudgeter.Repositories.User
             throw new NotSupportedException();
         }
 
-        public async Task<UserProfileProperty> CreateWithDataForDNN(UserProfileProperty entity, ProfilePropertyVisibility visibility)
+        public async Task<UserProfileProperty> CreateWithData(UserProfileProperty entity, ProfilePropertyVisibility visibility)
         {
             var dbRecord = new UserProfile
             {

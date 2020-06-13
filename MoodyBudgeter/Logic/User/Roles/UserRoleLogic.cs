@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MoodyBudgeter.Logic.Grid;
+using MoodyBudgeter.Logic.User.Roles;
 using MoodyBudgeter.Models.Exceptions;
 using MoodyBudgeter.Models.Grid;
 using MoodyBudgeter.Models.Paging;
 using MoodyBudgeter.Models.User.Roles;
 using MoodyBudgeter.Repositories.User;
-using System;
+using MoodyBudgeter.Utility.Cache;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,21 +15,20 @@ namespace MoodyBudgeter.Logic.User
 {
     public class UserRoleLogic
     {
-        //private readonly IBudgeterCache Cache;
+        private readonly IBudgeterCache Cache;
         private readonly ContextWrapper Context;
 
-        public UserRoleLogic(ContextWrapper context)
+        public UserRoleLogic(IBudgeterCache cache, ContextWrapper context)
         {
-            //Cache = cache;
+            Cache = cache;
             Context = context;
         }
 
         public async Task<List<UserRole>> GetUserRoles(int userId, bool isAdmin)
         {
-            //var userRoleCache = new UserRoleCache(Cache, PortalId);
+            var userRoleCache = new UserRoleCache(Cache);
 
-            //List<UserRole> cacheResult = await userRoleCache.GetUserRolesFromCache(userId, isAdmin);
-            List<UserRole> cacheResult = null;
+            List<UserRole> cacheResult = await userRoleCache.GetUserRolesFromCache(userId, isAdmin);
 
             if (cacheResult != null)
             {
@@ -46,7 +46,7 @@ namespace MoodyBudgeter.Logic.User
 
             if (roles != null)
             {
-                //await userRoleCache.AddUserRolesToCache(userId, roles, isAdmin);
+                await userRoleCache.AddUserRolesToCache(userId, roles, isAdmin);
             }
 
             return roles;

@@ -1,5 +1,10 @@
 ﻿using MoodyBudgeter.Models.Auth;
 using MoodyBudgeter.Models.Auth.Google;
+using MoodyBudgeter.Models.Exceptions;
+using MoodyBudgeter.Models.Paging;
+using MoodyBudgeter.Models.User.Profile;
+using MoodyBudgeter.Models.User.Registration;
+using MoodyBudgeter.Models.User.Search;
 using MoodyBudgeter.Utility.Clients.EnvironmentRequester;
 using MoodyBudgeter.Utility.Clients.GoogleAuth;
 using MoodyBudgeter.Utility.Clients.RestRequester;
@@ -23,7 +28,7 @@ namespace MoodyBudgeter.Logic.Auth.Google
             EnvironmentRequester = environmentRequester;
         }
 
-        public async Task<GoogleTokenResponse> VerifyAuthCode(GoogleSSORequest ssoRequest, int portalId)
+        public async Task<GoogleTokenResponse> VerifyAuthCode(GoogleSSORequest ssoRequest)
         {
             string secretKey = EnvironmentRequester.GetVariable("GoogleSSOClientSecret");
             string redirectUrl = EnvironmentRequester.GetVariable("LoyaltyRedirectUrl");
@@ -38,15 +43,15 @@ namespace MoodyBudgeter.Logic.Auth.Google
         {
             GoogleUserProfile googleUser = await GoogleOAuthClient.GetUserProfile(googleTokenResponse.AccessToken);
 
-            int userId = await FindExistingUserOrRegister(googleUser, portalId);
+            int userId = await FindExistingUserOrRegister(googleUser);
 
             string budgeterClientId = EnvironmentRequester.GetVariable("ServiceClientId");
-            BudgeterToken authTokenResponse = await GetAuthTokenForUser(portalId, userId, budgeterClientId, "Google");
+            BudgeterToken authTokenResponse = await GetAuthTokenForUser(userId, budgeterClientId, "Google");
 
             return new GoogleSSOResponse(googleTokenResponse, authTokenResponse);
         }
 
-        public async Task<int> RegisterGoogleUser(GoogleUserProfile googleUser, int portalId)
+        public async Task<int> RegisterGoogleUser(GoogleUserProfile googleUser)
         {
             // Register the new loyalty user
             RegistrationRequest registrationRequest = new RegistrationRequest
@@ -80,17 +85,17 @@ namespace MoodyBudgeter.Logic.Auth.Google
 
             string registerUserPath = $"/user/{portalId}/v1/user";
             RestRequester.BaseUrl = EnvironmentRequester.GetVariable("GatewayBase");
-            RegistrationRequest registrationResponse = await LoyaltyRequester.MakeRequest<RegistrationRequest>(portalId, registerUserPath, HttpMethod.Post, registrationRequest);
+            RegistrationRequest registrationResponse = await LoyaltyRequester.MakeRequest<RegistrationRequest>(registerUserPath, HttpMethod.Post, registrationRequest);
 
             return registrationResponse.UserId;
         }
 
-        public async Task<int> FindExistingUserOrRegister(GoogleUserProfile googleUser, int portalId)
+        public async Task<int> FindExistingUserOrRegister(GoogleUserProfile googleUser)
         {
             //Search for user in loyalty by GoogleId PP
             string ppSearchPath = $"/user/{portalId}/v1/search?searchtext={googleUser.Id}&profilepropertyname=GoogleId";
             RestRequester.BaseUrl = EnvironmentRequester.GetVariable("GatewayBase");
-            Page<SearchResponse> searchResponse = await LoyaltyRequester.MakeRequest<Page<SearchResponse>>(portalId, ppSearchPath, HttpMethod.Get, null);
+            Page<UserSearchResponse> searchResponse = await LoyaltyRequester.MakeRequest<Page<UserSearchResponse>>(ppSearchPath, HttpMethod.Get, null);
 
             if (searchResponse != null && searchResponse.Records != null && searchResponse.Records.Count > 0)
             {
@@ -101,44 +106,43 @@ namespace MoodyBudgeter.Logic.Auth.Google
                 //Search for user in loyalty by Google Email as Username
                 string usernameSearchPath = $"/user/{portalId}/v1/search?searchtext={googleUser.Email}&searchusername=true";
                 RestRequester.BaseUrl = EnvironmentRequester.GetVariable("GatewayBase");
-                searchResponse = await LoyaltyRequester.MakeRequest<Page<SearchResponse>>(portalId, usernameSearchPath, HttpMethod.Get, null);
+                searchResponse = await LoyaltyRequester.MakeRequest<Page<UserSearchResponse>>(usernameSearchPath, HttpMethod.Get, null);
             }
 
             if (searchResponse != null && searchResponse.Records != null && searchResponse.Records.Count > 0)
             {
-                SearchResponse loyaltyUser = searchResponse.Records.FirstOrDefault();
-                await AddGoogleIdToLoyaltyPP(loyaltyUser, portalId, googleUser.Id);
-                return loyaltyUser.UserId;
+                UserSearchResponse user = searchResponse.Records.FirstOrDefault();
+                await AddGoogleIdToProfileProperty(user, googleUser.Id);
+                return user.UserId;
             }
             else
             {
                 //Search for user in loyalty by Google Email as Email PP
                 string usernameSearchPath = $"/user/{portalId}/v1/search?searchtext={googleUser.Email}&profilepropertyname=Email";
                 RestRequester.BaseUrl = EnvironmentRequester.GetVariable("GatewayBase");
-                searchResponse = await LoyaltyRequester.MakeRequest<Page<SearchResponse>>(portalId, usernameSearchPath, HttpMethod.Get, null);
+                searchResponse = await LoyaltyRequester.MakeRequest<Page<UserSearchResponse>>(usernameSearchPath, HttpMethod.Get, null);
             }
 
             if (searchResponse != null && searchResponse.Records != null && searchResponse.Records.Count > 0)
             {
-                SearchResponse loyaltyUser = searchResponse.Records.FirstOrDefault();
-                await AddGoogleIdToLoyaltyPP(loyaltyUser, portalId, googleUser.Id);
+                UserSearchResponse loyaltyUser = searchResponse.Records.FirstOrDefault();
+                await AddGoogleIdToProfileProperty(loyaltyUser, googleUser.Id);
                 return loyaltyUser.UserId;
             }
             else
             {
                 //User does not exist in Loyalty, so Register them
-                return await RegisterGoogleUser(googleUser, portalId);
+                return await RegisterGoogleUser(googleUser);
             }
         }
 
-        public async Task AddGoogleIdToProfileProperty(SearchResponse user, int portalId, string googleId)
+        public async Task AddGoogleIdToProfileProperty(UserSearchResponse user, string googleId)
         {
             List<UserProfileProperty> googleIdPP = new List<UserProfileProperty>
             {
                 new UserProfileProperty
                 {
                     UserId = user.UserId,
-                    SubAccountId = user.SubAccountId,
                     Value = googleId,
                     ProfilePropertyName = "GoogleId"
                 }
@@ -146,7 +150,7 @@ namespace MoodyBudgeter.Logic.Auth.Google
 
             string updateUserProfilePropertyPath = $"/user/{portalId}/v1/userprofileproperty";
             RestRequester.BaseUrl = EnvironmentRequester.GetVariable("GatewayBase");
-            await LoyaltyRequester.MakeRequest<List<UserProfileProperty>>(portalId, updateUserProfilePropertyPath, HttpMethod.Put, googleIdPP);
+            await LoyaltyRequester.MakeRequest<List<UserProfileProperty>>(updateUserProfilePropertyPath, HttpMethod.Put, googleIdPP);
         }
 
         public void VerifyTokenBody(GoogleTokenResponse body)
@@ -157,7 +161,7 @@ namespace MoodyBudgeter.Logic.Auth.Google
             }
         }
 
-        public async Task<BudgeterToken> GetLoyaltyAuthTokenForUser(int portalId, int userId, string googleClientId, string provider)
+        public async Task<BudgeterToken> GetAuthTokenForUser(int userId, string googleClientId, string provider)
         {
             // reach out to LAPI for access token
             var path = $"/auth/{portalId}/v1/token/provider";
@@ -167,7 +171,7 @@ namespace MoodyBudgeter.Logic.Auth.Google
             path += $"&audience={googleClientId}";
 
             RestRequester.BaseUrl = EnvironmentRequester.GetVariable("GatewayBase");
-            return await LoyaltyRequester.MakeRequest<LoyaltyToken>(portalId, path, HttpMethod.Get, null);
+            return await LoyaltyRequester.MakeRequest<LoyaltyToken>(path, HttpMethod.Get, null);
         }
     }
 }

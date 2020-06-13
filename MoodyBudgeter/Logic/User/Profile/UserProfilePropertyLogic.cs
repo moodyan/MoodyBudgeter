@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MoodyBudgeter.Logic.User.Profile;
 using MoodyBudgeter.Models.User.Profile;
 using MoodyBudgeter.Repositories.User;
+using MoodyBudgeter.Utility.Cache;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,22 +11,21 @@ namespace MoodyBudgeter.Logic.User
 {
     public class UserProfilePropertyLogic
     {
-        //private readonly IBudgeterCache Cache;
+        private readonly IBudgeterCache Cache;
         private readonly ContextWrapper Context;
 
-        public UserProfilePropertyLogic(ContextWrapper context)
+        public UserProfilePropertyLogic(IBudgeterCache cache, ContextWrapper context)
         {
-            //Cache = cache;
+            Cache = cache;
             Context = context;
         }
 
         // Gets a users profile for a Portal. This will return empty values for Properties the user does not fill out.
-        public async Task<List<UserProfileProperty>> GetUserProfileProperties(int userId, bool isAdmin, int? subAccountId = null)
+        public async Task<List<UserProfileProperty>> GetUserProfileProperties(int userId, bool isAdmin)
         {
-            //var cache = new UserProfilePropertyCache(Cache, PortalId);
+            var cache = new UserProfilePropertyCache(Cache);
 
-            //var userProfileProperties = await cache.GetUserProfilePropertiesFromCache(userId, isAdmin, subAccountId);
-            List<UserProfileProperty> userProfileProperties = null;
+            List<UserProfileProperty> userProfileProperties = await cache.GetUserProfilePropertiesFromCache(userId, isAdmin);
 
             if (userProfileProperties != null)
             {
@@ -40,7 +41,7 @@ namespace MoodyBudgeter.Logic.User
                 userProfileProperties = await query.ToListAsync();
             }
 
-            //await cache.AddUserProfilePropertiesToCache(userId, isAdmin, userProfileProperties, subAccountId);
+            await cache.AddUserProfilePropertiesToCache(userId, isAdmin, userProfileProperties);
 
             return userProfileProperties;
         }

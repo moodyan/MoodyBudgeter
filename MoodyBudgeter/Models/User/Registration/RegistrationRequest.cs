@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MoodyBudgeter.Models.User.Profile;
+using System.Collections.Generic;
 
 namespace MoodyBudgeter.Models.User.Registration
 {

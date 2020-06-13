@@ -28,7 +28,6 @@ namespace MoodyBudgeter.Data.User
         public DateTime? LastModifiedOnDate { get; set; }
         public int? DefaultVisibility { get; set; }
         public bool ReadOnly { get; set; }
-        public int Level { get; set; }
         public string Description { get; set; }
         public string Label { get; set; }
         public string PcreRegex { get; set; }
