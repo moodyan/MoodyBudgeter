@@ -1,0 +1,6 @@
+# Override file used for uploading images to our ECR repository
+version: '3.4'
+
+services:
+  moodybudgeter:
+    image: 876198195441.dkr.ecr.us-west-2.amazonaws.com/loyalty_services/moodybudgeter:${TAG}

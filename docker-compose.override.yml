@@ -1,0 +1,17 @@
+version: '3.4'
+
+services:
+  moodybudgeter:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "7915:80"
+    env_file:
+      - 'secrets.env'
+    volumes:
+      - ${USERPROFILE}/.aws:/root/.aws
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
