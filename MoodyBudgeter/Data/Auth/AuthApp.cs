@@ -14,6 +14,6 @@ namespace MoodyBudgeter.Data.Auth
         public int? UserId { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateUpdated { get; set; }
-        public string UpdateBy { get; set; }
+        public string UpdatedBy { get; set; }
     }
 }

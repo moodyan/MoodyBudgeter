@@ -38,7 +38,7 @@ namespace MoodyBudgeter.Repositories.Auth
                         UserId = r.UserId,
                         DateCreated = r.DateCreated,
                         DateUpdated = r.DateUpdated,
-                        UpdateBy = r.UpdateBy,
+                        UpdateBy = r.UpdatedBy,
                     });
         }
 
@@ -56,7 +56,7 @@ namespace MoodyBudgeter.Repositories.Auth
                 UserId = entity.UserId,
                 DateCreated = DateTime.UtcNow,
                 DateUpdated = DateTime.UtcNow,
-                UpdateBy = entity.UpdateBy,
+                UpdatedBy = entity.UpdateBy,
             };
 
             Uow.DbContext.App.Add(dbRecord);
@@ -93,7 +93,7 @@ namespace MoodyBudgeter.Repositories.Auth
             dbRecord.RedirectUri = entity.RedirectUri;
             dbRecord.UserId = entity.UserId;
             dbRecord.DateUpdated = DateTime.UtcNow;
-            dbRecord.UpdateBy = entity.UpdateBy;
+            dbRecord.UpdatedBy = entity.UpdateBy;
 
             await Uow.SaveChanges();
 
@@ -135,7 +135,7 @@ namespace MoodyBudgeter.Repositories.Auth
                 UserId = dbRecord.UserId,
                 DateCreated = dbRecord.DateCreated,
                 DateUpdated = dbRecord.DateUpdated,
-                UpdateBy = dbRecord.UpdateBy,
+                UpdateBy = dbRecord.UpdatedBy,
             };
         }
     }

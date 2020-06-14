@@ -47,7 +47,7 @@ namespace MoodyBudgeter.Data.Auth
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.Property(e => e.UpdateBy)
+                entity.Property(e => e.UpdatedBy)
                     .IsRequired()
                     .HasMaxLength(50);
 
