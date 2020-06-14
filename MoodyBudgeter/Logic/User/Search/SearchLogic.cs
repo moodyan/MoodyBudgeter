@@ -5,6 +5,7 @@ using MoodyBudgeter.Models.Paging;
 using MoodyBudgeter.Models.User.Profile;
 using MoodyBudgeter.Models.User.Search;
 using MoodyBudgeter.Repositories.User;
+using MoodyBudgeter.Utility.Cache;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,20 +14,20 @@ namespace MoodyBudgeter.Logic.User.Search
 {
     public class SearchLogic
     {
-        //private readonly IBudgeterCache Cache;
+        private readonly IBudgeterCache Cache;
         private readonly ContextWrapper Context;
 
-        public SearchLogic(ContextWrapper context)
+        public SearchLogic(IBudgeterCache cache, ContextWrapper context)
         {
             Context = context;
+            Cache = cache;
         }
 
         public async Task<Page<UserSearchResponse>> Search(UserSearch search)
         {
-            //var searchCache = new SearchCache(Cache, PortalId);
+            SearchCache searchCache = new SearchCache(Cache);
 
-            //var response = await searchCache.GetSearchResponseFromCache(search);
-            Page<UserSearchResponse> response = null;
+            Page<UserSearchResponse> response = await searchCache.GetSearchResponseFromCache(search);
 
             if (response != null)
             {
@@ -47,7 +48,7 @@ namespace MoodyBudgeter.Logic.User.Search
                 response = await SearchByProfileProperty(search);
             }
 
-            //await searchCache.AddSearchResponseToCache(response, search);
+            await searchCache.AddSearchResponseToCache(response, search);
 
             return response;
         }
@@ -113,7 +114,7 @@ namespace MoodyBudgeter.Logic.User.Search
 
         private async Task<ProfileProperty> ValidateProfilePropertyForSearch(UserSearch search)
         {
-            var profilePropertyLogic = new ProfilePropertyLogic(Context);
+            var profilePropertyLogic = new ProfilePropertyLogic(Cache, Context);
 
             var property = search.ProfilePropertyId.HasValue ?
                 await profilePropertyLogic.GetProfileProperty(search.ProfilePropertyId.Value, search.IsAdmin) :

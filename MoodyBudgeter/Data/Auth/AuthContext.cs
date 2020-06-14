@@ -5,6 +5,7 @@ namespace MoodyBudgeter.Data.Auth
 {
     public class AuthContext : DbContext
     {
+        public virtual DbSet<AuthApp> App { get; set; }
         public virtual DbSet<AuthSecurityRole> SecurityRole { get; set; }
         public virtual DbSet<AuthUserCredential> UserCredential { get; set; }
         public virtual DbSet<AuthUserSecurityRole> UserSecurityRole { get; set; }
@@ -24,6 +25,35 @@ namespace MoodyBudgeter.Data.Auth
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<AuthApp>(entity =>
+            {
+                entity.HasKey(e => e.ClientId);
+
+                entity.ToTable("auth_App");
+
+                entity.Property(e => e.ClientId)
+                    .HasMaxLength(100)
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DateCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getutcdate())");
+
+                entity.Property(e => e.DateUpdated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getutcdate())");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.UpdateBy)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.UserId).HasColumnName("UserID");
+            });
+
             modelBuilder.Entity<AuthSecurityRole>(entity =>
             {
                 entity.HasKey(e => e.SecurityRoleId);

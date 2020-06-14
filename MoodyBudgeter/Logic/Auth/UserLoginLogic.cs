@@ -56,7 +56,7 @@ namespace MoodyBudgeter.Logic.Auth
 
             var passwordLogic = new PasswordLogic(Context);
 
-            var passwordInvalid = await passwordLogic.ValidatePasswordRegex(userCredential.Password);
+            var passwordInvalid = passwordLogic.ValidatePasswordRegex(userCredential.Password);
 
             if (passwordInvalid)
             {

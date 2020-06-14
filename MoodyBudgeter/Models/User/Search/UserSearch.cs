@@ -6,7 +6,6 @@
         public string ProfilePropertyName { get; set; }
         public int? ProfilePropertyId { get; set; }
         public bool SearchUsername { get; set; }
-        public bool SearchSubAccounts { get; set; }
         public SearchOperator Operator { get; set; }
         public int PageSize { get; set; }
         public int PageOffset { get; set; }

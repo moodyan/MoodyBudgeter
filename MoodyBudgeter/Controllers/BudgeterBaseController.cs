@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace MoodyBudgeter.Controllers
 {
-    public class BaseController : Controller
+    public class BudgeterBaseController : Controller
     {
         private TokenParser _token;
 

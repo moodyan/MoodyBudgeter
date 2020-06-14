@@ -2,29 +2,36 @@
 using MoodyBudgeter.Logic.Auth.Google;
 using MoodyBudgeter.Models.Auth.Google;
 using MoodyBudgeter.Models.Exceptions;
+using MoodyBudgeter.Repositories.User;
+using MoodyBudgeter.Utility.Cache;
 using MoodyBudgeter.Utility.Clients.EnvironmentRequester;
 using MoodyBudgeter.Utility.Clients.GoogleAuth;
 using MoodyBudgeter.Utility.Clients.RestRequester;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using MoodyBudgeter.Utility.Lock;
 using System.Threading.Tasks;
 
 namespace MoodyBudgeter.Controllers
 {
 
-    [Route("google/{portalId}/v1/[controller]")]
-    public class GoogleAuthController : ControllerBase
+    [Route("google/v1/[controller]")]
+    public class GoogleAuthController : BudgeterBaseController
     {
         private readonly IGoogleOAuthClient GoogleOAuthClient;
         private readonly IRestRequester RestRequester;
         private readonly IEnvironmentRequester EnvironmentRequester;
+        private readonly IBudgeterCache Cache;
+        private readonly IBudgeterLock BudgeterLock;
+        private readonly ContextWrapper Context;
 
-        public GoogleAuthController(IGoogleOAuthClient googleOAuthClient, IRestRequester restRequester, IEnvironmentRequester environmentRequester)
+        public GoogleAuthController(IGoogleOAuthClient googleOAuthClient, IRestRequester restRequester, IEnvironmentRequester environmentRequester, IBudgeterCache cache, ContextWrapper context, IBudgeterLock budgeterLock)
         {
             GoogleOAuthClient = googleOAuthClient;
             RestRequester = restRequester;
             EnvironmentRequester = environmentRequester;
+            Cache = cache;
+            Context = context;
+            Context = new ContextWrapper();
+            BudgeterLock = budgeterLock;
         }
 
         /// <summary>
@@ -45,11 +52,11 @@ namespace MoodyBudgeter.Controllers
                 throw new CallerException("Google Client Id and Authorization Code are required.");
             }
 
-            GoogleSSOLogic ssoLogic = new GoogleSSOLogic(GoogleOAuthClient, RestRequester, EnvironmentRequester);
+            GoogleSSOLogic ssoLogic = new GoogleSSOLogic(GoogleOAuthClient, RestRequester, EnvironmentRequester, Cache, Context, BudgeterLock);
 
             GoogleTokenResponse tokenResponse = await ssoLogic.VerifyAuthCode(ssoRequest);
 
-            return await ssoLogic.LoginOrRegisterGoogleUser(tokenResponse);
+            return await ssoLogic.LoginOrRegisterGoogleUser(tokenResponse, IsAdmin);
         }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MoodyBudgeter.Logic.User;
+using MoodyBudgeter.Logic.User.Search;
 using MoodyBudgeter.Models.Auth;
-using MoodyBudgeter.Models.Auth.Password;
 using MoodyBudgeter.Models.Exceptions;
-using MoodyBudgeter.Models.User.Registration;
+using MoodyBudgeter.Models.Paging;
+using MoodyBudgeter.Models.User.Search;
 using MoodyBudgeter.Repositories.Auth;
+using MoodyBudgeter.Utility.Cache;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -14,20 +16,23 @@ namespace MoodyBudgeter.Logic.Auth.Password
 {
     public class PasswordResetLogic
     {
-        private readonly ContextWrapper Context;
-        private readonly ContextWrapper UserContext;
+        private readonly Repositories.Auth.ContextWrapper AuthContext;
+        private readonly Repositories.User.ContextWrapper UserContext;
+        private readonly IBudgeterCache Cache;
 
         private const int RESET_TOKEN_BYTE_LENGTH = 20;
         private const int RESET_TIME_IN_MINUTES = 60;
 
-        public PasswordResetLogic(ContextWrapper context)
+        public PasswordResetLogic(IBudgeterCache cache, Repositories.Auth.ContextWrapper authContext, Repositories.User.ContextWrapper userContext)
         {
-            Context = context;
+            AuthContext = authContext;
+            UserContext = userContext;
+            Cache = cache;
         }
 
         public async Task ResetPassword(string username)
         {
-            var userCredentialLogic = new UserCredentialLogic(Context);
+            var userCredentialLogic = new UserCredentialLogic(AuthContext);
 
             var credential = await userCredentialLogic.GetUserCredential(username);
 
@@ -41,11 +46,20 @@ namespace MoodyBudgeter.Logic.Auth.Password
 
         public async Task<UserCredential> FindAndCreateCredentialFromResetText(string resetEntry)
         {
-            var userLoginLogic = new UserLoginLogic(Context);
-            var userLogic = new UserLogic(Context);
+            var userLoginLogic = new UserLoginLogic(AuthContext);
+            var searchLogic = new SearchLogic(Cache, UserContext);
+            var userLogic = new UserLogic(Cache, UserContext);
+
+            UserSearch usernameSearch = new UserSearch
+            {
+                SearchText = resetEntry,
+                SearchUsername = true,
+                Operator = SearchOperator.Equals,
+                PageSize = 1
+            };
 
             // Search by username
-            var result = await userLogic.FindUserByUsername(resetEntry);
+            Page<UserSearchResponse> result = await searchLogic.Search(usernameSearch);
 
             if (result != null && result.Records.Count > 0)
             {
@@ -54,8 +68,16 @@ namespace MoodyBudgeter.Logic.Auth.Password
                 return await userLoginLogic.CreateEmptyLogin(userResult.UserId, userResult.SearchFieldValue);
             }
 
+            UserSearch emailSearch = new UserSearch
+            {
+                SearchText = resetEntry,
+                ProfilePropertyName = "email",
+                Operator = SearchOperator.Equals,
+                PageSize = 1
+            };
+
             // Search by email
-            var emailResult = await userLogic.FindUserByEmail(resetEntry);
+            Page<UserSearchResponse> emailResult = await searchLogic.Search(emailSearch);
 
             if (emailResult != null && emailResult.Records.Count > 0)
             {
@@ -68,9 +90,9 @@ namespace MoodyBudgeter.Logic.Auth.Password
 
                 var emailUserResult = emailResult.Records.FirstOrDefault();
 
-                var user = await userLogic.GetUser(emailUserResult.UserId);
+                var user = await userLogic.GetUserWithoutRelated(emailUserResult.UserId);
 
-                var userCredentialLogic = new UserCredentialLogic(Context);
+                var userCredentialLogic = new UserCredentialLogic(AuthContext);
 
                 var credential = await userCredentialLogic.GetUserCredential(user.Username);
 
@@ -87,16 +109,16 @@ namespace MoodyBudgeter.Logic.Auth.Password
 
         public async Task ResetPassword(int userId)
         {
-            var userCredentialLogic = new UserCredentialLogic(Context);
-            var userLogic = new UserLogic(Context);
+            var userCredentialLogic = new UserCredentialLogic(AuthContext);
+            var userLogic = new UserLogic(Cache, UserContext);
 
             var credential = await userCredentialLogic.GetUserCredential(userId);
 
             if (credential == null)
             {
-                var user = await userLogic.GetUser(userId);
+                var user = await userLogic.GetUserWithoutRelated(userId);
 
-                var userLoginLogic = new UserLoginLogic(Context);
+                var userLoginLogic = new UserLoginLogic(AuthContext);
 
                 credential = await userLoginLogic.CreateEmptyLogin(userId, user.Username);
             }
@@ -116,25 +138,25 @@ namespace MoodyBudgeter.Logic.Auth.Password
 
             await userCredentialLogic.Update(userCredential);
 
-            var message = new PasswordReset
-            {
-                UserId = userCredential.UserId,
-                ResetToken = userCredential.ResetToken
-            };
+            //var message = new PasswordReset
+            //{
+            //    UserId = userCredential.UserId,
+            //    ResetToken = userCredential.ResetToken
+            //};
 
-            await QueueSender.SendMessage<PasswordReset>(message);
+            //await QueueSender.SendMessage<PasswordReset>(message);
         }
 
         public async Task<string> CreateEmptyCredentialsWithResetToken(int userId, string username)
         {
-            var userLoginLogic = new UserLoginLogic(Context);
+            var userLoginLogic = new UserLoginLogic(AuthContext);
 
             var userCredential = await userLoginLogic.CreateEmptyLogin(userId, username);
 
             userCredential.ResetToken = GenerateResetToken();
             userCredential.ResetExpiration = DateTime.UtcNow.AddMinutes(RESET_TIME_IN_MINUTES);
 
-            var userCredentialLogic = new UserCredentialLogic(Context);
+            var userCredentialLogic = new UserCredentialLogic(AuthContext);
 
             await userCredentialLogic.Update(userCredential);
 
@@ -144,35 +166,10 @@ namespace MoodyBudgeter.Logic.Auth.Password
         public async Task<int> ProcessReset(string resetToken, string newPassword)
         {
             var credential = await ValidatePasswordResetToken(resetToken);
-            var userLogic = new UserLogic(Context);
 
-            await new PasswordLogic(Context).ChangePassword(credential, newPassword);
-
-            if (await ShouldEnableUser())
-            {
-                await userLogic.EnableUser(credential.UserId);
-            }
+            await new PasswordLogic(AuthContext).ChangePassword(credential, newPassword);
 
             return credential.UserId;
-        }
-
-        private async Task<bool> ShouldEnableUser()
-        {
-            string setting = await SettingsRequester.GetSetting("SystemSettings_UserRegistration");
-
-            if (!int.TryParse(setting, out int type))
-            {
-                return false;
-            }
-
-            var registrationType = (RegistrationType)type;
-
-            if (registrationType == RegistrationType.Verified)
-            {
-                return true;
-            }
-
-            return false;
         }
 
         private string GenerateResetToken()
@@ -193,7 +190,7 @@ namespace MoodyBudgeter.Logic.Auth.Password
 
             UserCredential userCredential;
 
-            using (var uow = new UnitOfWork(Context))
+            using (var uow = new Repositories.Auth.UnitOfWork(AuthContext))
             {
                 var repo = new UserCredentialRepository(uow);
 
