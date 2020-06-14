@@ -14,8 +14,6 @@ namespace MoodyBudgeter.Models.User.Roles
         public DateTime? ExpiryDate { get; set; }
         public DateTime? CreatedOnDate { get; set; }
         public string RoleName { get; set; }
-        public string RoleGroupName { get; set; }
-        public int? RoleGroupId { get; set; }
         public int Ordinal { get; set; }
 
         public void GetEntityIds(List<LocalizableEntity> localizableEntities)
@@ -25,15 +23,6 @@ namespace MoodyBudgeter.Models.User.Roles
                 EntityId = RoleId,
                 EntityType = "Roles"
             });
-
-            if (RoleGroupId.HasValue)
-            {
-                localizableEntities.Add(new LocalizableEntity
-                {
-                    EntityId = RoleGroupId.Value,
-                    EntityType = "RoleGroups"
-                });
-            }
         }
 
         public void Localize(List<LanguageField> languageFields)
@@ -45,19 +34,6 @@ namespace MoodyBudgeter.Models.User.Roles
                 if (field.Field == "RoleName")
                 {
                     RoleName = field.Text;
-                }
-            }
-
-            if (RoleGroupId.HasValue)
-            {
-                var applicableGroupFields = languageFields.Where(c => c.EntityType == "RoleGroups" && c.EntityId == RoleGroupId).ToList();
-
-                foreach (var field in applicableGroupFields)
-                {
-                    if (field.Field == "RoleGroupName")
-                    {
-                        RoleGroupName = field.Text;
-                    }
                 }
             }
         }

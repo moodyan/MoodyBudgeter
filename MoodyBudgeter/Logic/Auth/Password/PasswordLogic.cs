@@ -15,7 +15,7 @@ namespace MoodyBudgeter.Logic.Auth.Password
         private const int PASSWORD_ATTEMPT_MAX_COUNT = 10;
         private const int PASSWORD_ATTEMPT_MINUTE_WINDOW = 5;
 
-        public PasswordLogic(ContextWrapper context)
+        public PasswordLogic(AuthContextWrapper context)
         {
             UserCredentialLogic = new UserCredentialLogic(context);
         }

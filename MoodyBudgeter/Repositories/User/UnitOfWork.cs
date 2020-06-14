@@ -8,9 +8,9 @@ namespace MoodyBudgeter.Repositories.User
     {
         public UserContext DbContext { get; set; }
 
-        private readonly ContextWrapper Context;
+        private readonly UserContextWrapper Context;
 
-        public UnitOfWork(ContextWrapper context)
+        public UnitOfWork(UserContextWrapper context)
         {
             Context = context;
             if (context.Context == null)

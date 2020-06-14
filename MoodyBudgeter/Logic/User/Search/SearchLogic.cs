@@ -15,9 +15,9 @@ namespace MoodyBudgeter.Logic.User.Search
     public class SearchLogic
     {
         private readonly IBudgeterCache Cache;
-        private readonly ContextWrapper Context;
+        private readonly UserContextWrapper Context;
 
-        public SearchLogic(IBudgeterCache cache, ContextWrapper context)
+        public SearchLogic(IBudgeterCache cache, UserContextWrapper context)
         {
             Context = context;
             Cache = cache;
@@ -68,7 +68,7 @@ namespace MoodyBudgeter.Logic.User.Search
                 var sortField = !string.IsNullOrWhiteSpace(search.SortField) ? search.SortField.Trim().ToLower() : "searchfieldvalue";
                 response.SortExpression = GetSortExpression(sortField, search.SortAscending);
 
-                query = query.OrderBy(response.SortExpression);
+                //query = query.OrderBy(response.SortExpression);
 
                 records = await query.Skip(search.PageSize * search.PageOffset).Take(search.PageSize).ToListAsync();
             }
@@ -99,7 +99,7 @@ namespace MoodyBudgeter.Logic.User.Search
                 var sortField = !string.IsNullOrWhiteSpace(search.SortField) ? search.SortField.Trim().ToLower() : "searchfieldvalue";
                 response.SortExpression = GetSortExpression(sortField, search.SortAscending);
 
-                query = query.OrderBy(response.SortExpression);
+                //query = query.OrderBy(response.SortExpression);
 
                 records = await query.Skip(search.PageSize * search.PageOffset).Take(search.PageSize).ToListAsync();
             }

@@ -12,9 +12,9 @@ namespace MoodyBudgeter.Logic.Settings
     public class SettingsLogic
     {
         private readonly IBudgeterCache Cache;
-        private readonly ContextWrapper Context;
+        private readonly SettingsContextWrapper Context;
 
-        public SettingsLogic(IBudgeterCache cache, ContextWrapper context)
+        public SettingsLogic(IBudgeterCache cache, SettingsContextWrapper context)
         {
             Cache = cache;
             Context = context;

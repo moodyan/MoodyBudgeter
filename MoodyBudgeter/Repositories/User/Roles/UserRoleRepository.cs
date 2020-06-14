@@ -70,8 +70,6 @@ namespace MoodyBudgeter.Repositories.User
                 ExpiryDate = r.ExpiryDate,
                 CreatedOnDate = r.CreatedOnDate,
                 RoleName = r.Role.RoleName,
-                RoleGroupId = r.Role.RoleGroupId,
-                RoleGroupName = r.Role.RoleGroup == null ? null : r.Role.RoleGroup.RoleGroupName,
                 Ordinal = r.Role.Ordinal
             });
         }
@@ -98,8 +96,6 @@ namespace MoodyBudgeter.Repositories.User
                         ExpiryDate = u.ExpiryDate,
                         CreatedOnDate = u.CreatedOnDate,
                         RoleName = u.Role.RoleName,
-                        RoleGroupName = u.Role.RoleGroup.RoleGroupName,
-                        RoleGroupId = u.Role.RoleGroupId,
                         Ordinal = u.Role.Ordinal,
                         Username = u.User.Username,
                         Email = u.User.UserProfile.FirstOrDefault(p => p.PropertyDefinition.PropertyName == "Email").PropertyValue,

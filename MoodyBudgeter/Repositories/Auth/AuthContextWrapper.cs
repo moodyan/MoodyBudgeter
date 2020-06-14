@@ -2,14 +2,14 @@
 
 namespace MoodyBudgeter.Repositories.Auth
 {
-    public class ContextWrapper
+    public class AuthContextWrapper
     {
         public AuthContext Context { get; set; }
         public bool Injected { get; set; }
 
-        public ContextWrapper() { }
+        public AuthContextWrapper() { }
 
-        public ContextWrapper(AuthContext context)
+        public AuthContextWrapper(AuthContext context)
         {
             Context = context;
             Injected = true;

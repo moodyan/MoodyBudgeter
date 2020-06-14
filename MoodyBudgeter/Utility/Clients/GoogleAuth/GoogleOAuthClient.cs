@@ -1,5 +1,7 @@
 ﻿using MoodyBudgeter.Models.Auth.Google;
+using MoodyBudgeter.Models.Exceptions;
 using MoodyBudgeter.Utility.Clients.RestRequester;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace MoodyBudgeter.Utility.Clients.GoogleAuth

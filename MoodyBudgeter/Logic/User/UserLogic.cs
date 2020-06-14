@@ -11,9 +11,9 @@ namespace MoodyBudgeter.Logic.User
     public class UserLogic
     {
         private readonly IBudgeterCache Cache;
-        private readonly ContextWrapper Context;
+        private readonly UserContextWrapper Context;
 
-        public UserLogic(IBudgeterCache cache, ContextWrapper context)
+        public UserLogic(IBudgeterCache cache, UserContextWrapper context)
         {
             Cache = cache;
             Context = context;

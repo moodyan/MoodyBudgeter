@@ -1,17 +1,19 @@
-﻿using MoodyBudgeter.Logic.User.Profile;
+﻿using MoodyBudgeter.Logic.Auth.Password;
+using MoodyBudgeter.Logic.User.Profile;
 using MoodyBudgeter.Logic.User.Roles;
 using MoodyBudgeter.Models.Exceptions;
 using MoodyBudgeter.Models.User;
 using MoodyBudgeter.Models.User.Profile;
 using MoodyBudgeter.Models.User.Registration;
 using MoodyBudgeter.Models.User.Roles;
+using MoodyBudgeter.Repositories.Auth;
 using MoodyBudgeter.Repositories.User;
 using MoodyBudgeter.Utility.Cache;
+using MoodyBudgeter.Utility.Clients.Settings;
 using MoodyBudgeter.Utility.Lock;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace MoodyBudgeter.Logic.User.Registration
@@ -20,14 +22,18 @@ namespace MoodyBudgeter.Logic.User.Registration
     {
         private readonly IBudgeterCache Cache;
         private readonly IBudgeterLock BudgeterLock;
-        private readonly ContextWrapper Context;
+        private readonly ISettingRequester SettingRequester;
+        private readonly AuthContextWrapper AuthContext;
+        private readonly UserContextWrapper UserContext;
         private readonly bool IsAdmin;
 
-        public RegistrationLogic(IBudgeterCache cache, IBudgeterLock budgeterLock, ContextWrapper context, bool isAdmin)
+        public RegistrationLogic(IBudgeterCache cache, IBudgeterLock budgeterLock, AuthContextWrapper authContext, UserContextWrapper userContext, ISettingRequester settingRequester, bool isAdmin)
         {
             Cache = cache;
             BudgeterLock = budgeterLock;
-            Context = context;
+            SettingRequester = settingRequester;
+            AuthContext = authContext;
+            UserContext = userContext;
             IsAdmin = isAdmin;
         }
 
@@ -39,13 +45,13 @@ namespace MoodyBudgeter.Logic.User.Registration
 
             await IsUserEnabled(registrationType);
 
-            var userProfileUpdater = new UserProfileUpdater(Cache, BudgeterLock, Context);
+            var userProfileUpdater = new UserProfileUpdater(Cache, BudgeterLock, UserContext);
 
             // Validate the profile first, we don't want to create the user, and then fail registration.
             // TODO: Thread safety. I think we have to wait until we can delete users to handle this property, check, register, then save profile, if profile fails delete user.
             var validatedProfile = await userProfileUpdater.ValidateUserProfilePropertyUpdates(registrationRequest.UserProfileProperties, IsAdmin, true);
 
-            var user = await new UserLogic(Cache, Context).CreateUser(new BudgetUser { Username = registrationRequest.Username });
+            var user = await new UserLogic(Cache, UserContext).CreateUser(new BudgetUser { Username = registrationRequest.Username });
 
             registrationRequest.UserId = user.UserId;
 
@@ -80,7 +86,7 @@ namespace MoodyBudgeter.Logic.User.Registration
                 throw new CallerException("Username may not contain spaces.");
             }
 
-            var usernameLogic = new UsernameLogic(Cache, Context);
+            var usernameLogic = new UsernameLogic(Cache, SettingRequester, UserContext);
 
             await usernameLogic.ValidateUsername(registrationRequest.Username);
 
@@ -143,11 +149,11 @@ namespace MoodyBudgeter.Logic.User.Registration
 
         private async Task GiveUserRoles(int userId)
         {
-            var roleLogic = new RoleLogic(Cache, Context);
+            var roleLogic = new RoleLogic(Cache, UserContext);
 
             var roles = await roleLogic.GetAutoRolesOnPortal();
 
-            var userRoleUpdater = new UserRoleUpdater(Cache, Context);
+            var userRoleUpdater = new UserRoleUpdater(Cache, UserContext);
 
             foreach (var role in roles)
             {
@@ -172,9 +178,8 @@ namespace MoodyBudgeter.Logic.User.Registration
 
         private async Task<string> CreateRegistrationToken(RegistrationRequest registrationRequest)
         {
-            var path = $"/auth/{PortalId}/v1/password/reset/emptycredential?username={registrationRequest.Username}&userid={registrationRequest.UserId}";
-
-            string token = await LoyaltyRequester.MakeRequest<string>(path, HttpMethod.Post, null);
+            var passwordResetLogic = new PasswordResetLogic(Cache, AuthContext, UserContext);
+            string token = await passwordResetLogic.CreateEmptyCredentialsWithResetToken(registrationRequest.UserId, registrationRequest.Username);
 
             return token;
         }

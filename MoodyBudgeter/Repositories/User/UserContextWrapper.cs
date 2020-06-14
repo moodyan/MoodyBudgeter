@@ -2,14 +2,14 @@
 
 namespace MoodyBudgeter.Repositories.User
 {
-    public class ContextWrapper
+    public class UserContextWrapper
     {
         public UserContext Context { get; set; }
         public bool Injected { get; set; }
 
-        public ContextWrapper() { }
+        public UserContextWrapper() { }
 
-        public ContextWrapper(UserContext context)
+        public UserContextWrapper(UserContext context)
         {
             Context = context;
             Injected = true;

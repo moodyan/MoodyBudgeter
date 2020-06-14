@@ -3,6 +3,8 @@ using MoodyBudgeter.Logic.User;
 using MoodyBudgeter.Models.Auth.Token;
 using MoodyBudgeter.Models.Exceptions;
 using MoodyBudgeter.Models.User.Roles;
+using MoodyBudgeter.Repositories.Auth;
+using MoodyBudgeter.Repositories.User;
 using MoodyBudgeter.Utility.Cache;
 using MoodyBudgeter.Utility.Clients.EnvironmentRequester;
 using System;
@@ -16,8 +18,8 @@ namespace MoodyBudgeter.Logic.Auth.Token
 {
     public class TokenIssuer
     {
-        private readonly Repositories.Auth.ContextWrapper AuthContext;
-        private readonly Repositories.User.ContextWrapper UserContext;
+        private readonly AuthContextWrapper AuthContext;
+        private readonly UserContextWrapper UserContext;
         private readonly IBudgeterCache Cache;
         private readonly string SecretKey;
         private readonly string Issuer;
@@ -25,7 +27,7 @@ namespace MoodyBudgeter.Logic.Auth.Token
         private int ExpirationDateInSeconds;
         private DateTime ExpirationDate;
 
-        public TokenIssuer(IEnvironmentRequester environmentRequester, Repositories.Auth.ContextWrapper authContext, Repositories.User.ContextWrapper userContext, IBudgeterCache cache)
+        public TokenIssuer(IEnvironmentRequester environmentRequester, AuthContextWrapper authContext, UserContextWrapper userContext, IBudgeterCache cache)
         {
             AuthContext = authContext;
             UserContext = userContext;

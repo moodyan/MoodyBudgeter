@@ -5,9 +5,6 @@ using MoodyBudgeter.Models.User.Roles;
 using MoodyBudgeter.Repositories.Settings;
 using MoodyBudgeter.Utility.Auth;
 using MoodyBudgeter.Utility.Cache;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MoodyBudgeter.Controllers.Settings
@@ -16,12 +13,12 @@ namespace MoodyBudgeter.Controllers.Settings
     public class SettingController : BudgeterBaseController
     {
         private readonly IBudgeterCache Cache;
-        private readonly ContextWrapper Context;
+        private readonly SettingsContextWrapper Context;
 
         public SettingController(IBudgeterCache cache)
         {
             Cache = cache;
-            Context = new ContextWrapper();
+            Context = new SettingsContextWrapper();
         }
 
         [Route("{settingname}"), HttpGet]

@@ -15,9 +15,9 @@ namespace MoodyBudgeter.Logic.Settings
     public class SiteListLogic
     {
         private readonly IBudgeterCache Cache;
-        private readonly ContextWrapper Context;
+        private readonly SettingsContextWrapper Context;
 
-        public SiteListLogic(IBudgeterCache cache, ContextWrapper context)
+        public SiteListLogic(IBudgeterCache cache, SettingsContextWrapper context)
         {
             Cache = cache;
             Context = context;

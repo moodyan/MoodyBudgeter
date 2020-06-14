@@ -7,9 +7,11 @@ using MoodyBudgeter.Models.User;
 using MoodyBudgeter.Models.User.Registration;
 using MoodyBudgeter.Models.User.Roles;
 using MoodyBudgeter.Models.User.Search;
+using MoodyBudgeter.Repositories.Auth;
 using MoodyBudgeter.Repositories.User;
 using MoodyBudgeter.Utility.Auth;
 using MoodyBudgeter.Utility.Cache;
+using MoodyBudgeter.Utility.Clients.Settings;
 using MoodyBudgeter.Utility.Lock;
 using System.Threading.Tasks;
 
@@ -20,20 +22,24 @@ namespace MoodyBudgeter.Controllers
     {
         private readonly IBudgeterCache Cache;
         private readonly IBudgeterLock BudgeterLock;
-        private readonly ContextWrapper Context;
+        private readonly ISettingRequester SettingRequester;
+        private readonly UserContextWrapper UserContext;
+        private readonly AuthContextWrapper AuthContext;
 
-        public UserController(IBudgeterCache cache, IBudgeterLock budgeterLock)
+        public UserController(IBudgeterCache cache, IBudgeterLock budgeterLock, ISettingRequester settingRequester)
         {
             Cache = cache;
             BudgeterLock = budgeterLock;
-            Context = new ContextWrapper();
+            SettingRequester = settingRequester;
+            UserContext = new UserContextWrapper();
+            AuthContext = new AuthContextWrapper();
         }
 
         [HttpGet]
         [BudgeterAuthorize]
         public async Task<BudgetUser> Get()
         {
-            var userLogic = new UserLogic(Cache, Context);
+            var userLogic = new UserLogic(Cache, UserContext);
 
             return await userLogic.GetUserWithRelated(UserId, IsAdmin);
         }
@@ -44,7 +50,7 @@ namespace MoodyBudgeter.Controllers
         {
             CheckIfPassedUserIDAllowed(id);
 
-            var userLogic = new UserLogic(Cache, Context);
+            var userLogic = new UserLogic(Cache, UserContext);
 
             return await userLogic.GetUserWithRelated(id, IsAdmin);
         }
@@ -54,7 +60,7 @@ namespace MoodyBudgeter.Controllers
         {
             CheckNullBody(registrationRequest);
 
-            var registrationLogic = new RegistrationLogic(Cache, BudgeterLock, Context, IsAdmin);
+            var registrationLogic = new RegistrationLogic(Cache, BudgeterLock, AuthContext, UserContext, SettingRequester, IsAdmin);
 
             return await registrationLogic.RegisterUser(registrationRequest);
         }
@@ -66,7 +72,7 @@ namespace MoodyBudgeter.Controllers
         {
             CheckNullBody(gridRequest);
 
-            var gridLogic = new UserGridLogic(Context);
+            var gridLogic = new UserGridLogic(UserContext);
 
             return await gridLogic.GetGrid(gridRequest, profilePropertyId, searchText, searchOperator, includeDeleted);
         }

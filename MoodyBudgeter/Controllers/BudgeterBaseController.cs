@@ -27,24 +27,6 @@ namespace MoodyBudgeter.Controllers
             }
         }
 
-        protected int? Level
-        {
-            get
-            {
-                if (HttpContext.Request.Headers.TryGetValue("Level", out var levelValue))
-                {
-                    if (int.TryParse(levelValue, out var levelNum))
-                    {
-                        return levelNum;
-                    }
-
-                    return null;
-                }
-
-                return null;
-            }
-        }
-
         protected int UserId
         {
             get

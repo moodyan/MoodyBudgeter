@@ -2,14 +2,14 @@
 
 namespace MoodyBudgeter.Repositories.Settings
 {
-    public class ContextWrapper
+    public class SettingsContextWrapper
     {
         public SettingContext Context { get; set; }
         public bool Injected { get; set; }
 
-        public ContextWrapper() { }
+        public SettingsContextWrapper() { }
 
-        public ContextWrapper(SettingContext context)
+        public SettingsContextWrapper(SettingContext context)
         {
             Context = context;
             Injected = true;

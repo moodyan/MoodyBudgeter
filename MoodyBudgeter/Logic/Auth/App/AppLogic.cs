@@ -14,9 +14,9 @@ namespace MoodyBudgeter.Logic.Auth.App
     public class AppLogic
     {
         private readonly AppCache AppCache;
-        private readonly ContextWrapper Context;
+        private readonly AuthContextWrapper Context;
 
-        public AppLogic(IBudgeterCache cache, ContextWrapper context)
+        public AppLogic(IBudgeterCache cache, AuthContextWrapper context)
         {
             AppCache = new AppCache(cache);
             Context = context;

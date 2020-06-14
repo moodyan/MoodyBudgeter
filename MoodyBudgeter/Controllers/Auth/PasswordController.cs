@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MoodyBudgeter.Logic.Auth.Password;
 using MoodyBudgeter.Models.User.Roles;
+using MoodyBudgeter.Repositories.Auth;
+using MoodyBudgeter.Repositories.User;
 using MoodyBudgeter.Utility.Auth;
 using MoodyBudgeter.Utility.Cache;
 using System.Threading.Tasks;
@@ -10,14 +12,14 @@ namespace MoodyBudgeter.Controllers.Auth
     [Route("auth/v1/[controller]")]
     public class PasswordController : BudgeterBaseController
     {
-        private readonly Repositories.Auth.ContextWrapper AuthContext;
-        private readonly Repositories.User.ContextWrapper UserContext;
+        private readonly AuthContextWrapper AuthContext;
+        private readonly UserContextWrapper UserContext;
         private readonly IBudgeterCache Cache;
 
         public PasswordController(IBudgeterCache cache)
         {
-            UserContext = new Repositories.User.ContextWrapper();
-            AuthContext = new Repositories.Auth.ContextWrapper();
+            UserContext = new UserContextWrapper();
+            AuthContext = new AuthContextWrapper();
             Cache = cache;
         }
 

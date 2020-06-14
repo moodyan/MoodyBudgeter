@@ -10,7 +10,6 @@ namespace MoodyBudgeter.Data.User
         public virtual DbSet<UserProfile> UserProfile { get; set; }
         public virtual DbSet<UserRoles> UserRoles { get; set; }
         public virtual DbSet<Roles> Roles { get; set; }
-        public virtual DbSet<RoleGroups> RoleGroups { get; set; }
 
         public UserContext() { }
 
@@ -160,8 +159,6 @@ namespace MoodyBudgeter.Data.User
 
                 entity.Property(e => e.Length).HasDefaultValueSql("((0))");
 
-                entity.Property(e => e.Level).HasDefaultValueSql("((0))");
-
                 entity.Property(e => e.ModuleDefId).HasColumnName("ModuleDefID");
 
                 entity.Property(e => e.PcreRegex).HasMaxLength(100);
@@ -233,17 +230,6 @@ namespace MoodyBudgeter.Data.User
                 entity.HasIndex(e => e.BillingFrequency)
                     .HasName("IX_Roles");
 
-                entity.HasIndex(e => new { e.PortalId, e.RoleName })
-                    .HasName("IX_RoleName")
-                    .IsUnique();
-
-                entity.HasIndex(e => new { e.RoleId, e.PortalId, e.RoleName })
-                    .HasName("IX_Roles_RoleName")
-                    .IsUnique();
-
-                entity.HasIndex(e => new { e.RoleId, e.RoleGroupId, e.RoleName })
-                    .HasName("IX_Roles_RoleGroup");
-
                 entity.Property(e => e.RoleId).HasColumnName("RoleID");
 
                 entity.Property(e => e.BillingFrequency)
@@ -264,10 +250,6 @@ namespace MoodyBudgeter.Data.User
 
                 entity.Property(e => e.Ordinal).HasDefaultValueSql("((100))");
 
-                entity.Property(e => e.PortalId).HasColumnName("PortalID");
-
-                entity.Property(e => e.RoleGroupId).HasColumnName("RoleGroupID");
-
                 entity.Property(e => e.RoleName)
                     .IsRequired()
                     .HasMaxLength(50);
@@ -287,38 +269,6 @@ namespace MoodyBudgeter.Data.User
                 entity.Property(e => e.TrialFrequency)
                     .HasMaxLength(1)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.RoleGroup)
-                    .WithMany(p => p.Roles)
-                    .HasForeignKey(d => d.RoleGroupId)
-                    .HasConstraintName("FK_Roles_RoleGroups");
-            });
-
-            modelBuilder.Entity<RoleGroups>(entity =>
-            {
-                entity.HasKey(e => e.RoleGroupId);
-
-                entity.HasIndex(e => new { e.PortalId, e.RoleGroupName })
-                    .HasName("IX_RoleGroupName")
-                    .IsUnique();
-
-                entity.Property(e => e.RoleGroupId).HasColumnName("RoleGroupID");
-
-                entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
-
-                entity.Property(e => e.CreatedOnDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Description).HasMaxLength(1000);
-
-                entity.Property(e => e.LastModifiedByUserId).HasColumnName("LastModifiedByUserID");
-
-                entity.Property(e => e.LastModifiedOnDate).HasColumnType("datetime");
-
-                entity.Property(e => e.PortalId).HasColumnName("PortalID");
-
-                entity.Property(e => e.RoleGroupName)
-                    .IsRequired()
-                    .HasMaxLength(50);
             });
         }
     }

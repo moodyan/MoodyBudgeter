@@ -16,9 +16,9 @@ namespace MoodyBudgeter.Logic.User.Profile
     {
         private readonly IBudgeterCache Cache;
         private readonly IBudgeterLock LoyaltyLock;
-        private readonly ContextWrapper Context;
+        private readonly UserContextWrapper Context;
 
-        public UserProfileUpdater(IBudgeterCache cache, IBudgeterLock loyaltyLock, ContextWrapper context)
+        public UserProfileUpdater(IBudgeterCache cache, IBudgeterLock loyaltyLock, UserContextWrapper context)
         {
             Cache = cache;
             LoyaltyLock = loyaltyLock;

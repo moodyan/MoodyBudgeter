@@ -1,4 +1,7 @@
-﻿using MoodyBudgeter.Logic.User.Registration;
+﻿using MoodyBudgeter.Logic.Auth.Token;
+using MoodyBudgeter.Logic.User.Profile;
+using MoodyBudgeter.Logic.User.Registration;
+using MoodyBudgeter.Logic.User.Search;
 using MoodyBudgeter.Models.Auth;
 using MoodyBudgeter.Models.Auth.Google;
 using MoodyBudgeter.Models.Exceptions;
@@ -6,15 +9,15 @@ using MoodyBudgeter.Models.Paging;
 using MoodyBudgeter.Models.User.Profile;
 using MoodyBudgeter.Models.User.Registration;
 using MoodyBudgeter.Models.User.Search;
+using MoodyBudgeter.Repositories.Auth;
 using MoodyBudgeter.Repositories.User;
 using MoodyBudgeter.Utility.Cache;
 using MoodyBudgeter.Utility.Clients.EnvironmentRequester;
 using MoodyBudgeter.Utility.Clients.GoogleAuth;
-using MoodyBudgeter.Utility.Clients.RestRequester;
+using MoodyBudgeter.Utility.Clients.Settings;
 using MoodyBudgeter.Utility.Lock;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace MoodyBudgeter.Logic.Auth.Google
@@ -22,26 +25,28 @@ namespace MoodyBudgeter.Logic.Auth.Google
     public class GoogleSSOLogic
     {
         private readonly IGoogleOAuthClient GoogleOAuthClient;
-        private readonly IRestRequester RestRequester;
         private readonly IEnvironmentRequester EnvironmentRequester;
+        private readonly ISettingRequester SettingRequester;
         private readonly IBudgeterCache Cache;
         private readonly IBudgeterLock BudgeterLock;
-        private readonly ContextWrapper Context;
+        private readonly UserContextWrapper UserContext;
+        private readonly AuthContextWrapper AuthContext;
 
-        public GoogleSSOLogic(IGoogleOAuthClient googleOAuthClient, IRestRequester restRequester, IEnvironmentRequester environmentRequester, IBudgeterCache cache, ContextWrapper context, IBudgeterLock budgeterLock)
+        public GoogleSSOLogic(IGoogleOAuthClient googleOAuthClient, IEnvironmentRequester environmentRequester, ISettingRequester settingRequester, IBudgeterCache cache, UserContextWrapper userContext, AuthContextWrapper authContext, IBudgeterLock budgeterLock)
         {
             GoogleOAuthClient = googleOAuthClient;
-            RestRequester = restRequester;
             EnvironmentRequester = environmentRequester;
+            SettingRequester = settingRequester;
             Cache = cache;
-            Context = context;
+            UserContext = userContext;
+            AuthContext = authContext;
             BudgeterLock = budgeterLock;
         }
 
         public async Task<GoogleTokenResponse> VerifyAuthCode(GoogleSSORequest ssoRequest)
         {
             string secretKey = EnvironmentRequester.GetVariable("GoogleSSOClientSecret");
-            string redirectUrl = EnvironmentRequester.GetVariable("LoyaltyRedirectUrl");
+            string redirectUrl = EnvironmentRequester.GetVariable("BudgeterRedirectUrl");
             string googleRequestedScope = EnvironmentRequester.GetVariable("GoogleRequestedScope");
 
             GoogleTokenResponse tokenResponse = await GoogleOAuthClient.VerifyCode(ssoRequest, secretKey, redirectUrl, googleRequestedScope);
@@ -93,7 +98,7 @@ namespace MoodyBudgeter.Logic.Auth.Google
                 }
             };
 
-            RegistrationLogic registrationLogic = new RegistrationLogic(Cache, BudgeterLock, Context, isAdmin);
+            RegistrationLogic registrationLogic = new RegistrationLogic(Cache, BudgeterLock, AuthContext, UserContext, SettingRequester, isAdmin);
 
             RegistrationRequest registrationResponse = await registrationLogic.RegisterUser(registrationRequest);
             return registrationResponse.UserId;
@@ -101,10 +106,16 @@ namespace MoodyBudgeter.Logic.Auth.Google
 
         public async Task<int> FindExistingUserOrRegister(GoogleUserProfile googleUser, bool isAdmin)
         {
-            //Search for user in loyalty by GoogleId PP
-            string ppSearchPath = $"/user/{portalId}/v1/search?searchtext={googleUser.Id}&profilepropertyname=GoogleId";
-            RestRequester.BaseUrl = EnvironmentRequester.GetVariable("GatewayBase");
-            Page<UserSearchResponse> searchResponse = await LoyaltyRequester.MakeRequest<Page<UserSearchResponse>>(ppSearchPath, HttpMethod.Get, null);
+            //Search for user by GoogleId PP
+            var searchLogic = new SearchLogic(Cache, UserContext);
+
+            var search = new UserSearch
+            {
+                SearchText = googleUser.Id,
+                ProfilePropertyName = "GoogleId"
+            };
+
+            Page<UserSearchResponse> searchResponse = await searchLogic.Search(search);
 
             if (searchResponse != null && searchResponse.Records != null && searchResponse.Records.Count > 0)
             {
@@ -112,40 +123,48 @@ namespace MoodyBudgeter.Logic.Auth.Google
             }
             else
             {
-                //Search for user in loyalty by Google Email as Username
-                string usernameSearchPath = $"/user/{portalId}/v1/search?searchtext={googleUser.Email}&searchusername=true";
-                RestRequester.BaseUrl = EnvironmentRequester.GetVariable("GatewayBase");
-                searchResponse = await LoyaltyRequester.MakeRequest<Page<UserSearchResponse>>(usernameSearchPath, HttpMethod.Get, null);
+                //Search for user by Google Email as Username
+                var usernameSearch = new UserSearch
+                {
+                    SearchText = googleUser.Email,
+                    SearchUsername = true
+                };
+
+                searchResponse = await searchLogic.Search(usernameSearch);
             }
 
             if (searchResponse != null && searchResponse.Records != null && searchResponse.Records.Count > 0)
             {
                 UserSearchResponse user = searchResponse.Records.FirstOrDefault();
-                await AddGoogleIdToProfileProperty(user, googleUser.Id);
+                await AddGoogleIdToProfileProperty(user, googleUser.Id, isAdmin);
                 return user.UserId;
             }
             else
             {
-                //Search for user in loyalty by Google Email as Email PP
-                string usernameSearchPath = $"/user/{portalId}/v1/search?searchtext={googleUser.Email}&profilepropertyname=Email";
-                RestRequester.BaseUrl = EnvironmentRequester.GetVariable("GatewayBase");
-                searchResponse = await LoyaltyRequester.MakeRequest<Page<UserSearchResponse>>(usernameSearchPath, HttpMethod.Get, null);
+                //Search for user by Google Email as Email PP
+                var emailSearch = new UserSearch
+                {
+                    SearchText = googleUser.Email,
+                    ProfilePropertyName = "Email"
+                };
+
+                searchResponse = await searchLogic.Search(emailSearch);
             }
 
             if (searchResponse != null && searchResponse.Records != null && searchResponse.Records.Count > 0)
             {
-                UserSearchResponse loyaltyUser = searchResponse.Records.FirstOrDefault();
-                await AddGoogleIdToProfileProperty(loyaltyUser, googleUser.Id);
-                return loyaltyUser.UserId;
+                UserSearchResponse user = searchResponse.Records.FirstOrDefault();
+                await AddGoogleIdToProfileProperty(user, googleUser.Id, isAdmin);
+                return user.UserId;
             }
             else
             {
-                //User does not exist in Loyalty, so Register them
+                //User does not exist, so Register them
                 return await RegisterGoogleUser(googleUser, isAdmin);
             }
         }
 
-        public async Task AddGoogleIdToProfileProperty(UserSearchResponse user, string googleId)
+        public async Task AddGoogleIdToProfileProperty(UserSearchResponse user, string googleId, bool isAdmin)
         {
             List<UserProfileProperty> googleIdPP = new List<UserProfileProperty>
             {
@@ -156,10 +175,10 @@ namespace MoodyBudgeter.Logic.Auth.Google
                     ProfilePropertyName = "GoogleId"
                 }
             };
+            
+            UserProfileUpdater userProfileUpdater = new UserProfileUpdater(Cache, BudgeterLock, UserContext);
 
-            string updateUserProfilePropertyPath = $"/user/{portalId}/v1/userprofileproperty";
-            RestRequester.BaseUrl = EnvironmentRequester.GetVariable("GatewayBase");
-            await LoyaltyRequester.MakeRequest<List<UserProfileProperty>>(updateUserProfilePropertyPath, HttpMethod.Put, googleIdPP);
+            await userProfileUpdater.UpdateUserProfileProperties(googleIdPP, isAdmin);
         }
 
         public void VerifyTokenBody(GoogleTokenResponse body)
@@ -172,15 +191,9 @@ namespace MoodyBudgeter.Logic.Auth.Google
 
         public async Task<BudgeterToken> GetAuthTokenForUser(int userId, string googleClientId, string provider)
         {
-            // reach out to LAPI for access token
-            var path = $"/auth/{portalId}/v1/token/provider";
-            path += $"?userid={userId}";
-            path += $"&provider={provider}";
-            path += $"&portalid={portalId}";
-            path += $"&audience={googleClientId}";
+            var providerTokenLogic = new FederatedIdentityTokenLogic(EnvironmentRequester, UserContext, AuthContext, Cache);
 
-            RestRequester.BaseUrl = EnvironmentRequester.GetVariable("GatewayBase");
-            return await LoyaltyRequester.MakeRequest<LoyaltyToken>(path, HttpMethod.Get, null);
+            return await providerTokenLogic.IssueFederatedIdentityToken(userId, googleClientId, provider);
         }
     }
 }

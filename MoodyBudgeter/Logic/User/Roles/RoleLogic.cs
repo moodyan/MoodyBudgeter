@@ -16,9 +16,9 @@ namespace MoodyBudgeter.Logic.User.Roles
     public class RoleLogic
     {
         private readonly IBudgeterCache Cache;
-        private readonly ContextWrapper Context;
+        private readonly UserContextWrapper Context;
 
-        public RoleLogic(IBudgeterCache cache, ContextWrapper context)
+        public RoleLogic(IBudgeterCache cache, UserContextWrapper context)
         {
             Cache = cache;
             Context = context;

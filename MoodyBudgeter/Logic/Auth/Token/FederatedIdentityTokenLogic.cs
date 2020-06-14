@@ -1,5 +1,7 @@
 ﻿using MoodyBudgeter.Models.Auth;
 using MoodyBudgeter.Models.Auth.Token;
+using MoodyBudgeter.Repositories.Auth;
+using MoodyBudgeter.Repositories.User;
 using MoodyBudgeter.Utility.Cache;
 using MoodyBudgeter.Utility.Clients.EnvironmentRequester;
 using System.Threading.Tasks;
@@ -10,10 +12,10 @@ namespace MoodyBudgeter.Logic.Auth.Token
     {
         private readonly IEnvironmentRequester EnvironmentRequester;
         private readonly IBudgeterCache Cache;
-        private readonly Repositories.User.ContextWrapper UserContext;
-        private readonly Repositories.Auth.ContextWrapper AuthContext;
+        private readonly UserContextWrapper UserContext;
+        private readonly AuthContextWrapper AuthContext;
 
-        public FederatedIdentityTokenLogic(IEnvironmentRequester environmentRequester, Repositories.User.ContextWrapper userContext, Repositories.Auth.ContextWrapper authContext, IBudgeterCache cache)
+        public FederatedIdentityTokenLogic(IEnvironmentRequester environmentRequester, UserContextWrapper userContext, AuthContextWrapper authContext, IBudgeterCache cache)
         {
             EnvironmentRequester = environmentRequester;
             UserContext = userContext;

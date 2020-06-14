@@ -6,6 +6,7 @@ using MoodyBudgeter.Models.Exceptions;
 using MoodyBudgeter.Models.Paging;
 using MoodyBudgeter.Models.User.Search;
 using MoodyBudgeter.Repositories.Auth;
+using MoodyBudgeter.Repositories.User;
 using MoodyBudgeter.Utility.Cache;
 using System;
 using System.Linq;
@@ -16,14 +17,14 @@ namespace MoodyBudgeter.Logic.Auth.Password
 {
     public class PasswordResetLogic
     {
-        private readonly Repositories.Auth.ContextWrapper AuthContext;
-        private readonly Repositories.User.ContextWrapper UserContext;
+        private readonly AuthContextWrapper AuthContext;
+        private readonly UserContextWrapper UserContext;
         private readonly IBudgeterCache Cache;
 
         private const int RESET_TOKEN_BYTE_LENGTH = 20;
         private const int RESET_TIME_IN_MINUTES = 60;
 
-        public PasswordResetLogic(IBudgeterCache cache, Repositories.Auth.ContextWrapper authContext, Repositories.User.ContextWrapper userContext)
+        public PasswordResetLogic(IBudgeterCache cache, AuthContextWrapper authContext, UserContextWrapper userContext)
         {
             AuthContext = authContext;
             UserContext = userContext;

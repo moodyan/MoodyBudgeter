@@ -8,10 +8,10 @@ namespace MoodyBudgeter.Logic.Auth
 {
     public class UserLoginLogic
     {
-        private readonly ContextWrapper Context;
+        private readonly AuthContextWrapper Context;
         private readonly UserCredentialLogic UserCredentialLogic;
 
-        public UserLoginLogic(ContextWrapper context)
+        public UserLoginLogic(AuthContextWrapper context)
         {
             Context = context;
             UserCredentialLogic = new UserCredentialLogic(context);

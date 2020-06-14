@@ -11,9 +11,9 @@ namespace MoodyBudgeter.Logic.Auth
 {
     public class UserSecurityRoleLogic
     {
-        private readonly ContextWrapper Context;
+        private readonly AuthContextWrapper Context;
 
-        public UserSecurityRoleLogic(ContextWrapper context)
+        public UserSecurityRoleLogic(AuthContextWrapper context)
         {
             Context = context;
         }

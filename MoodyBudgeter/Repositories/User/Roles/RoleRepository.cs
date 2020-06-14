@@ -41,7 +41,6 @@ namespace MoodyBudgeter.Repositories.User.Roles
                         Description = r.Description,
                         IsVisible = r.IsPublic,
                         AutoAssignment = r.AutoAssignment,
-                        RoleGroupId = r.RoleGroupId,
                         Ordinal = r.Ordinal
                     });
         }
@@ -57,8 +56,6 @@ namespace MoodyBudgeter.Repositories.User.Roles
                         Description = r.Description,
                         IsVisible = r.IsPublic,
                         AutoAssignment = r.AutoAssignment,
-                        RoleGroupId = r.RoleGroup.RoleGroupId,
-                        RoleGroupName = r.RoleGroup != null ? r.RoleGroup.RoleGroupName : "",
                         Ordinal = r.Ordinal
                     });
         }
@@ -72,7 +69,6 @@ namespace MoodyBudgeter.Repositories.User.Roles
                 Description = entity.Description,
                 IsPublic = entity.IsVisible,
                 AutoAssignment = entity.AutoAssignment,
-                RoleGroupId = entity.RoleGroupId,
                 Ordinal = entity.Ordinal
             };
 
@@ -108,7 +104,6 @@ namespace MoodyBudgeter.Repositories.User.Roles
             dbRecord.Description = entity.Description;
             dbRecord.IsPublic = entity.IsVisible;
             dbRecord.AutoAssignment = entity.AutoAssignment;
-            dbRecord.RoleGroupId = entity.RoleGroupId;
             dbRecord.Ordinal = entity.Ordinal;
 
             await Uow.SaveChanges();
@@ -141,7 +136,6 @@ namespace MoodyBudgeter.Repositories.User.Roles
                 Description = dbRecord.Description,
                 IsVisible = dbRecord.IsPublic,
                 AutoAssignment = dbRecord.AutoAssignment,
-                RoleGroupId = dbRecord.RoleGroupId,
                 Ordinal = dbRecord.Ordinal
             };
 

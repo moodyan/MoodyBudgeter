@@ -3,6 +3,7 @@ using MoodyBudgeter.Models.Exceptions;
 using MoodyBudgeter.Models.User;
 using MoodyBudgeter.Repositories.User;
 using MoodyBudgeter.Utility.Cache;
+using MoodyBudgeter.Utility.Clients.Settings;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -12,12 +13,14 @@ namespace MoodyBudgeter.Logic.User
     public class UsernameLogic
     {
         private readonly IBudgeterCache Cache;
-        private readonly ContextWrapper Context;
+        private readonly ISettingRequester SettingRequester;
+        private readonly UserContextWrapper Context;
 
-        public UsernameLogic(IBudgeterCache cache, ContextWrapper context)
+        public UsernameLogic(IBudgeterCache cache, ISettingRequester settingRequester, UserContextWrapper context)
         {
             Context = context;
             Cache = cache;
+            SettingRequester = settingRequester;
         }
 
         public async Task<BudgetUser> UpdateUsername(int userId, string proposedUsername)
@@ -48,8 +51,8 @@ namespace MoodyBudgeter.Logic.User
             await ValidateUsername(proposedUsername);
             await UpdateUserRecordUsername(userId, proposedUsername);
 
-            //var userCacheLogic = new UserCacheLogic(Cache);
-            //await userCacheLogic.InvalidateLoyaltyUserCache(userId);
+            var userCacheLogic = new UserCacheLogic(Cache);
+            await userCacheLogic.InvalidateUserCache(userId);
         }
 
         public async Task ValidateUsername(string proposedUsername)

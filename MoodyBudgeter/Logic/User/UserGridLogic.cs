@@ -10,9 +10,9 @@ namespace MoodyBudgeter.Logic.User
 {
     public class UserGridLogic
     {
-        private readonly ContextWrapper Context;
+        private readonly UserContextWrapper Context;
 
-        public UserGridLogic(ContextWrapper context)
+        public UserGridLogic(UserContextWrapper context)
         {
             Context = context;
         }

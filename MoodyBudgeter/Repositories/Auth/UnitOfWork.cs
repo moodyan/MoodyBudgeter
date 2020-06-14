@@ -8,9 +8,9 @@ namespace MoodyBudgeter.Repositories.Auth
     {
         public AuthContext DbContext { get; set; }
 
-        private readonly ContextWrapper Context;
+        private readonly AuthContextWrapper Context;
 
-        public UnitOfWork(ContextWrapper context)
+        public UnitOfWork(AuthContextWrapper context)
         {
             Context = context;
 

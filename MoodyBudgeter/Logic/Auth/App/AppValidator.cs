@@ -12,9 +12,9 @@ namespace MoodyBudgeter.Logic.Auth.App
     public class AppValidator
     {
         private readonly IBudgeterCache Cache;
-        private readonly ContextWrapper Context;
+        private readonly AuthContextWrapper Context;
 
-        public AppValidator(IBudgeterCache cache, ContextWrapper context)
+        public AppValidator(IBudgeterCache cache, AuthContextWrapper context)
         {
             Cache = cache;
             Context = context;

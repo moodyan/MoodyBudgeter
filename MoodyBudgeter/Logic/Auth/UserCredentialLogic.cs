@@ -8,9 +8,9 @@ namespace MoodyBudgeter.Logic.Auth
 {
     public class UserCredentialLogic
     {
-        private readonly ContextWrapper Context;
+        private readonly AuthContextWrapper Context;
 
-        public UserCredentialLogic(ContextWrapper context)
+        public UserCredentialLogic(AuthContextWrapper context)
         {
             Context = context;
         }

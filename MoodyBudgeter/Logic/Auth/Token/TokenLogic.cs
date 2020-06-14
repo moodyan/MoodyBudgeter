@@ -2,6 +2,8 @@
 using MoodyBudgeter.Models.Auth;
 using MoodyBudgeter.Models.Auth.Token;
 using MoodyBudgeter.Models.Exceptions;
+using MoodyBudgeter.Repositories.Auth;
+using MoodyBudgeter.Repositories.User;
 using MoodyBudgeter.Utility.Cache;
 using MoodyBudgeter.Utility.Clients.EnvironmentRequester;
 using System.Threading.Tasks;
@@ -12,12 +14,12 @@ namespace MoodyBudgeter.Logic.Auth.Token
     {
         private readonly IBudgeterCache Cache;
         private readonly IEnvironmentRequester EnvironmentRequester;
-        private readonly Repositories.Auth.ContextWrapper AuthContext;
-        private readonly Repositories.User.ContextWrapper UserContext;
+        private readonly AuthContextWrapper AuthContext;
+        private readonly UserContextWrapper UserContext;
         private readonly string AuthHeader;
         private readonly TokenRequest TokenRequest;
 
-        public TokenLogic(IEnvironmentRequester environmentRequester, IBudgeterCache cache, Repositories.Auth.ContextWrapper authContext, Repositories.User.ContextWrapper userContext, string authHeader, TokenRequest tokenRequest)
+        public TokenLogic(IEnvironmentRequester environmentRequester, IBudgeterCache cache, AuthContextWrapper authContext, UserContextWrapper userContext, string authHeader, TokenRequest tokenRequest)
         {
             EnvironmentRequester = environmentRequester;
             Cache = cache;

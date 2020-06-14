@@ -12,9 +12,9 @@ namespace MoodyBudgeter.Logic.User
     public class UserProfilePropertyLogic
     {
         private readonly IBudgeterCache Cache;
-        private readonly ContextWrapper Context;
+        private readonly UserContextWrapper Context;
 
-        public UserProfilePropertyLogic(IBudgeterCache cache, ContextWrapper context)
+        public UserProfilePropertyLogic(IBudgeterCache cache, UserContextWrapper context)
         {
             Cache = cache;
             Context = context;

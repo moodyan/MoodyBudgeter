@@ -15,9 +15,9 @@ namespace MoodyBudgeter.Logic.Auth
 {
     public class UserLoginHistoryLogic
     {
-        private readonly ContextWrapper Context;
+        private readonly AuthContextWrapper Context;
 
-        public UserLoginHistoryLogic(ContextWrapper context)
+        public UserLoginHistoryLogic(AuthContextWrapper context)
         {
             Context = context;
         }

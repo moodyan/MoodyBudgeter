@@ -8,9 +8,9 @@ namespace MoodyBudgeter.Repositories.Settings
     {
         public SettingContext DbContext { get; set; }
 
-        private readonly ContextWrapper Context;
+        private readonly SettingsContextWrapper Context;
 
-        public UnitOfWork(ContextWrapper context)
+        public UnitOfWork(SettingsContextWrapper context)
         {
             Context = context;
 

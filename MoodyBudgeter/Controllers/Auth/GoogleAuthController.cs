@@ -2,11 +2,12 @@
 using MoodyBudgeter.Logic.Auth.Google;
 using MoodyBudgeter.Models.Auth.Google;
 using MoodyBudgeter.Models.Exceptions;
+using MoodyBudgeter.Repositories.Auth;
 using MoodyBudgeter.Repositories.User;
 using MoodyBudgeter.Utility.Cache;
 using MoodyBudgeter.Utility.Clients.EnvironmentRequester;
 using MoodyBudgeter.Utility.Clients.GoogleAuth;
-using MoodyBudgeter.Utility.Clients.RestRequester;
+using MoodyBudgeter.Utility.Clients.Settings;
 using MoodyBudgeter.Utility.Lock;
 using System.Threading.Tasks;
 
@@ -17,20 +18,21 @@ namespace MoodyBudgeter.Controllers
     public class GoogleAuthController : BudgeterBaseController
     {
         private readonly IGoogleOAuthClient GoogleOAuthClient;
-        private readonly IRestRequester RestRequester;
+        private readonly ISettingRequester SettingRequester;
         private readonly IEnvironmentRequester EnvironmentRequester;
         private readonly IBudgeterCache Cache;
         private readonly IBudgeterLock BudgeterLock;
-        private readonly ContextWrapper Context;
+        private readonly UserContextWrapper UserContext;
+        private readonly AuthContextWrapper AuthContext;
 
-        public GoogleAuthController(IGoogleOAuthClient googleOAuthClient, IRestRequester restRequester, IEnvironmentRequester environmentRequester, IBudgeterCache cache, ContextWrapper context, IBudgeterLock budgeterLock)
+        public GoogleAuthController(IGoogleOAuthClient googleOAuthClient, ISettingRequester settingRequester, IEnvironmentRequester environmentRequester, IBudgeterCache cache, IBudgeterLock budgeterLock)
         {
             GoogleOAuthClient = googleOAuthClient;
-            RestRequester = restRequester;
+            SettingRequester = settingRequester;
             EnvironmentRequester = environmentRequester;
             Cache = cache;
-            Context = context;
-            Context = new ContextWrapper();
+            UserContext = new UserContextWrapper();
+            AuthContext = new AuthContextWrapper();
             BudgeterLock = budgeterLock;
         }
 
@@ -52,7 +54,7 @@ namespace MoodyBudgeter.Controllers
                 throw new CallerException("Google Client Id and Authorization Code are required.");
             }
 
-            GoogleSSOLogic ssoLogic = new GoogleSSOLogic(GoogleOAuthClient, RestRequester, EnvironmentRequester, Cache, Context, BudgeterLock);
+            GoogleSSOLogic ssoLogic = new GoogleSSOLogic(GoogleOAuthClient, EnvironmentRequester, SettingRequester, Cache, UserContext, AuthContext, BudgeterLock);
 
             GoogleTokenResponse tokenResponse = await ssoLogic.VerifyAuthCode(ssoRequest);
 

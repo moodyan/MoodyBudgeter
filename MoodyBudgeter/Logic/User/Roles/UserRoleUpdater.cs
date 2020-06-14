@@ -10,9 +10,9 @@ namespace MoodyBudgeter.Logic.User.Roles
     public class UserRoleUpdater
     {
         private readonly IBudgeterCache Cache;
-        private readonly ContextWrapper Context;
+        private readonly UserContextWrapper Context;
 
-        public UserRoleUpdater(IBudgeterCache cache, ContextWrapper context)
+        public UserRoleUpdater(IBudgeterCache cache, UserContextWrapper context)
         {
             Cache = cache;
             Context = context;
