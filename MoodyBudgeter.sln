@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29806.167
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoodyBudgeter", "MoodyBudgeter\MoodyBudgeter.csproj", "{F41C67DB-C5E8-4B2B-992B-1EBDD0F7AEE0}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{11BC1FA6-04F3-43C7-A7B7-F94916384F7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoodyBudgeter.UnitTests", "..\MoodyBudgeter.UnitTests\MoodyBudgeter.UnitTests.csproj", "{5C0237E1-EC4E-49B1-B87B-9AE437870F91}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoodyBudgeter.IntegrationTests", "..\MoodyBudgeter.IntegrationTests\MoodyBudgeter.IntegrationTests.csproj", "{C392C301-01A4-4722-884D-ADDCF248A56D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoodyBudgeter.UnitTests", "..\MoodyBudgeter.UnitTests\MoodyBudgeter.UnitTests.csproj", "{DDC5F6FC-AF85-46B7-AD3D-FA36A66D1E25}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,14 +23,10 @@ Global
 		{11BC1FA6-04F3-43C7-A7B7-F94916384F7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11BC1FA6-04F3-43C7-A7B7-F94916384F7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11BC1FA6-04F3-43C7-A7B7-F94916384F7E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5C0237E1-EC4E-49B1-B87B-9AE437870F91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5C0237E1-EC4E-49B1-B87B-9AE437870F91}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5C0237E1-EC4E-49B1-B87B-9AE437870F91}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5C0237E1-EC4E-49B1-B87B-9AE437870F91}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C392C301-01A4-4722-884D-ADDCF248A56D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C392C301-01A4-4722-884D-ADDCF248A56D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C392C301-01A4-4722-884D-ADDCF248A56D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C392C301-01A4-4722-884D-ADDCF248A56D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDC5F6FC-AF85-46B7-AD3D-FA36A66D1E25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDC5F6FC-AF85-46B7-AD3D-FA36A66D1E25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDC5F6FC-AF85-46B7-AD3D-FA36A66D1E25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDC5F6FC-AF85-46B7-AD3D-FA36A66D1E25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
