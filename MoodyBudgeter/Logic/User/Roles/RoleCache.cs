@@ -18,16 +18,16 @@ namespace MoodyBudgeter.Logic.User.Roles
             Cache = cache;
         }
 
-        internal async Task<List<Role>> GetRolesFromCache(bool isAdmin, int? roleGroupId)
+        internal async Task<List<Role>> GetRolesFromCache(bool isAdmin)
         {
-            var Key = GetCacheKey(isAdmin, roleGroupId);
+            var Key = GetCacheKey(isAdmin);
 
             return await Cache.Get<List<Role>>(Key);
         }
 
-        internal async Task AddRolesToCache(List<Role> roles, bool isAdmin, int? roleGroupId)
+        internal async Task AddRolesToCache(List<Role> roles, bool isAdmin)
         {
-            var Key = GetCacheKey(isAdmin, roleGroupId);
+            var Key = GetCacheKey(isAdmin);
 
             await Cache.Insert(Key, roles, new TimeSpan(CACHE_TIME_IN_HOURS, 0, 0));
         }
@@ -37,9 +37,9 @@ namespace MoodyBudgeter.Logic.User.Roles
             await Cache.ScanRedisAndRemovePrefix(CACHE_KEY_PREFIX);
         }
 
-        private string GetCacheKey(bool isAdmin, int? roleGroupId)
+        private string GetCacheKey(bool isAdmin)
         {
-            return CACHE_KEY_PREFIX + "-isAdmin_" + isAdmin + "-roleGroupId_" + roleGroupId;
+            return CACHE_KEY_PREFIX + "-isAdmin_" + isAdmin;
         }
     }
 }

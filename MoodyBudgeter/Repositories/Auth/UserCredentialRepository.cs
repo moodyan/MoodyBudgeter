@@ -96,20 +96,6 @@ namespace MoodyBudgeter.Repositories.Auth
             return Translate(dbRecord);
         }
 
-        public async Task UpdateToPortalZero(int userId)
-        {
-            var dbRecord = (from r in Uow.DbContext.UserCredential
-                            where r.UserId == userId
-                            select r).FirstOrDefault();
-
-            if (dbRecord == null)
-            {
-                throw new CallerException("There is no UserCredential with that Id.");
-            }
-
-            await Uow.SaveChanges();
-        }
-
         public override Task Delete(int id)
         {
             throw new NotImplementedException();

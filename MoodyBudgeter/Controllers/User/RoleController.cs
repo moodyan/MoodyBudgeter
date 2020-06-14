@@ -25,11 +25,11 @@ namespace MoodyBudgeter.Controllers.User
 
         [HttpGet]
         [BudgeterAuthorize]
-        public async Task<List<Role>> GetRoles(int? roleGroupId)
+        public async Task<List<Role>> GetRoles()
         {
             var roleLogic = new RoleLogic(Cache, Context);
 
-            return await roleLogic.GetRolesForPortal(IsAdmin, roleGroupId);
+            return await roleLogic.GetRoles(IsAdmin);
         }
 
         [HttpGet, Route("{id}")]

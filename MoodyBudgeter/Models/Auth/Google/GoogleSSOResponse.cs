@@ -2,10 +2,10 @@
 {
     public class GoogleSSOResponse
     {
-        public GoogleSSOResponse(GoogleTokenResponse googleToken, BudgeterToken loyaltyToken)
+        public GoogleSSOResponse(GoogleTokenResponse googleToken, BudgeterToken budgeterToken)
         {
             GoogleToken = googleToken;
-            BudgeterToken = loyaltyToken;
+            BudgeterToken = budgeterToken;
         }
 
         public GoogleTokenResponse GoogleToken { get; set; }

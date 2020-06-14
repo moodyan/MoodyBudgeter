@@ -8,7 +8,6 @@ namespace MoodyBudgeter.Logic.Auth.Token
     public class TokenParser
     {
         public int UserId { get; set; }
-        public int PortalId { get; set; }
         public List<SecurityRole> SecurityRoles { get; set; }
 
         public TokenParser(string strToken)
@@ -31,11 +30,6 @@ namespace MoodyBudgeter.Logic.Auth.Token
                 if (claim.Type == "uid")
                 {
                     UserId = int.Parse(claim.Value);
-                }
-
-                if (claim.Type == "pid")
-                {
-                    PortalId = int.Parse(claim.Value);
                 }
 
                 if (claim.Type == "rol" && Enum.TryParse(claim.Value, out SecurityRole role))

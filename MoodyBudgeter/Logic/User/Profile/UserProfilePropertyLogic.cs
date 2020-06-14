@@ -20,7 +20,7 @@ namespace MoodyBudgeter.Logic.User
             Context = context;
         }
 
-        // Gets a users profile for a Portal. This will return empty values for Properties the user does not fill out.
+        // Gets a users profile. This will return empty values for Properties the user does not fill out.
         public async Task<List<UserProfileProperty>> GetUserProfileProperties(int userId, bool isAdmin)
         {
             var cache = new UserProfilePropertyCache(Cache);

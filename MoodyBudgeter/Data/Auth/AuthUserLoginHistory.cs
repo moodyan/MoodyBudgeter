@@ -5,7 +5,6 @@ namespace MoodyBudgeter.Data.Auth
     public class AuthUserLoginHistory
     {
         public int UserLoginHistoryId { get; set; }
-        public int PortalId { get; set; }
         public int UserId { get; set; }
         public DateTime LoginDate { get; set; }
         public int TokenType { get; set; }

@@ -37,10 +37,10 @@ namespace MoodyBudgeter.Controllers
         }
 
         /// <summary>
-        /// Logs a user into Loyalty with a Google Access Token
+        /// Logs in a user with a Google Access Token
         /// </summary>
         /// <remarks>
-        /// Given a Google One-Time Auth Code and ClientId, grant a Loyalty Access token for that user if they can be found in Loyalty based on the Google Email associated with the Access Token
+        /// Given a Google One-Time Auth Code and ClientId, grant an Access token for that user if they can be found based on the Google Email associated with the Access Token
         /// </remarks>
         /// <param name="ssoRequest">The SSO Request body</param>
         /// <returns></returns>

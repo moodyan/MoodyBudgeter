@@ -27,9 +27,9 @@ namespace MoodyBudgeter.Logic.User
         {
             await ChangeUsername(userId, proposedUsername);
 
-            UserLogic loyaltyUserLogic = new UserLogic(Cache, Context);
+            UserLogic userLogic = new UserLogic(Cache, Context);
 
-            return await loyaltyUserLogic.GetDBUser(userId);
+            return await userLogic.GetDBUser(userId);
         }
 
         public async Task ChangeUsername(int userId, string proposedUsername)
@@ -39,9 +39,9 @@ namespace MoodyBudgeter.Logic.User
                 throw new CallerException("Host username cannot be changed.");
             }
 
-            UserLogic loyaltyUserLogic = new UserLogic(Cache, Context);
+            UserLogic userLogic = new UserLogic(Cache, Context);
 
-            BudgetUser originalUser = await loyaltyUserLogic.GetUserWithoutRelated(userId);
+            BudgetUser originalUser = await userLogic.GetUserWithoutRelated(userId);
 
             if (originalUser == null)
             {

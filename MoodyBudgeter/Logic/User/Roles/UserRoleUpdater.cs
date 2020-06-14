@@ -158,7 +158,7 @@ namespace MoodyBudgeter.Logic.User.Roles
         //        Level = Level
         //    };
 
-        //    await QueueSender.SendMessage<UserRoleUpdated>(PortalId, message);
+        //    await QueueSender.SendMessage<UserRoleUpdated>(message);
         //}
     }
 }

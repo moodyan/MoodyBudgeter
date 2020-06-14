@@ -155,8 +155,8 @@ namespace MoodyBudgeter.Logic.User.Profile
                 updatedProfileProperty = await repo.Update(profileProperty);
             }
 
-            //await new ProfilePropertyCache(Cache, PortalId).InvalidateProfilePropertiesCache();
-            //await new UserProfilePropertyCache(Cache, PortalId).InvalidateUserProfilePropertiesCacheForPortal();
+            await new ProfilePropertyCache(Cache).InvalidateProfilePropertiesCache();
+            await new UserProfilePropertyCache(Cache).InvalidateUserProfilePropertiesCache();
 
             return updatedProfileProperty;
         }

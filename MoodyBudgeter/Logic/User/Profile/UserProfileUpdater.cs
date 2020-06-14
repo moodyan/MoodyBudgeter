@@ -15,13 +15,13 @@ namespace MoodyBudgeter.Logic.User.Profile
     public class UserProfileUpdater
     {
         private readonly IBudgeterCache Cache;
-        private readonly IBudgeterLock LoyaltyLock;
+        private readonly IBudgeterLock BudgeterLock;
         private readonly UserContextWrapper Context;
 
-        public UserProfileUpdater(IBudgeterCache cache, IBudgeterLock loyaltyLock, UserContextWrapper context)
+        public UserProfileUpdater(IBudgeterCache cache, IBudgeterLock budgeterLock, UserContextWrapper context)
         {
             Cache = cache;
-            LoyaltyLock = loyaltyLock;
+            BudgeterLock = budgeterLock;
             Context = context;
         }
 
@@ -91,7 +91,7 @@ namespace MoodyBudgeter.Logic.User.Profile
 
             if (evaluateUnique)
             {
-                using (await LoyaltyLock.Lock(lockName))
+                using (await BudgeterLock.Lock(lockName))
                 {
                     await ValidateUniqueness(userProfileProperty, profileProperty);
 
@@ -112,7 +112,7 @@ namespace MoodyBudgeter.Logic.User.Profile
         {
             if (evaluateUnique)
             {
-                using (await LoyaltyLock.Lock(lockName))
+                using (await BudgeterLock.Lock(lockName))
                 {
                     await ValidateUniqueness(userProfileProperty, profileProperty);
 
@@ -324,7 +324,7 @@ namespace MoodyBudgeter.Logic.User.Profile
         //        Level = Level
         //    };
 
-        //    await QueueSender.SendMessage<UserProfilePropertyUpdated>(PortalId, message);
+        //    await QueueSender.SendMessage<UserProfilePropertyUpdated>(message);
         //}
 
         private async Task<UserProfileProperty> ProcessExistingProfileProperty(UserProfileProperty existingUserProfileProperty, UserProfileProperty userProfileProperty, ProfileProperty profileProperty, bool evaluateUnique, string lockName)

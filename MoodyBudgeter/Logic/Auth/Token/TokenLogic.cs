@@ -67,7 +67,7 @@ namespace MoodyBudgeter.Logic.Auth.Token
 
             int userId = await new AuthCodeLogic(Cache).ValidateCode(TokenRequest);
 
-            var securityRoles = await new UserSecurityRoleLogic(AuthContext).GetSecurityRoles(userId, true);
+            var securityRoles = await new UserSecurityRoleLogic(AuthContext).GetSecurityRoles(userId);
 
             var tokenIssuer = new TokenIssuer(EnvironmentRequester, AuthContext, UserContext, Cache);
 
@@ -98,7 +98,7 @@ namespace MoodyBudgeter.Logic.Auth.Token
 
             int userId = tokenValidator.UserId;
 
-            var securityRoles = await new UserSecurityRoleLogic(AuthContext).GetSecurityRoles(userId, true);
+            var securityRoles = await new UserSecurityRoleLogic(AuthContext).GetSecurityRoles(userId);
 
             var accessTokenData = await new TokenIssuer(EnvironmentRequester, AuthContext, UserContext, Cache).IssueToken(userId, TokenRequest.ClientId, securityRoles, TokenType.RefreshAccess);
 
@@ -118,7 +118,7 @@ namespace MoodyBudgeter.Logic.Auth.Token
 
             var app = await new AppValidator(Cache, AuthContext).ValidateClientCredentialsTokenRequest(TokenRequest, AuthHeader);
 
-            var securityRoles = await new UserSecurityRoleLogic(AuthContext).GetSecurityRoles(app.UserId.Value, true);
+            var securityRoles = await new UserSecurityRoleLogic(AuthContext).GetSecurityRoles(app.UserId.Value);
 
             var accessTokenData = await new TokenIssuer(EnvironmentRequester, AuthContext, UserContext, Cache).IssueToken(app.UserId.Value, TokenRequest.ClientId, securityRoles, TokenType.ClientCredentials, checkEnabled: !TokenRequest.SuperUserRequest);
 

@@ -68,7 +68,7 @@ namespace MoodyBudgeter.Logic.Auth.Google
 
         public async Task<int> RegisterGoogleUser(GoogleUserProfile googleUser, bool isAdmin)
         {
-            // Register the new loyalty user
+            // Register the new user
             RegistrationRequest registrationRequest = new RegistrationRequest
             {
                 Username = googleUser.Email,

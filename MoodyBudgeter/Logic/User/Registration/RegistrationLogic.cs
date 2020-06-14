@@ -129,7 +129,7 @@ namespace MoodyBudgeter.Logic.User.Registration
             }
             else
             {
-                throw new CallerException("Registration type not set on portal");
+                throw new CallerException("Registration type not set.");
             }
         }
 
@@ -151,7 +151,7 @@ namespace MoodyBudgeter.Logic.User.Registration
         {
             var roleLogic = new RoleLogic(Cache, UserContext);
 
-            var roles = await roleLogic.GetAutoRolesOnPortal();
+            var roles = await roleLogic.GetAutoRoles();
 
             var userRoleUpdater = new UserRoleUpdater(Cache, UserContext);
 
@@ -200,7 +200,7 @@ namespace MoodyBudgeter.Logic.User.Registration
 
         //private async Task WhatEmailShouldWeSend(RegistrationRequest registrationRequest, RegistrationType type, UserRegistered message)
         //{
-        //    // We might need to send a verified email if the portal is set to verified and the caller wants a registration token (to make a loyalty login)
+        //    // We might need to send a verified email if the caller wants a registration token (to make a login)
         //    if (type == RegistrationType.Verified && registrationRequest.CreateRegistrationToken)
         //    {
         //        if (!string.IsNullOrEmpty(registrationRequest.RegistrationToken))

@@ -24,10 +24,10 @@ namespace MoodyBudgeter.Logic.User.Roles
             Context = context;
         }
 
-        public async Task<List<Role>> GetRolesForPortal(bool isAdmin, int? roleGroupId)
+        public async Task<List<Role>> GetRoles(bool isAdmin)
         {
             var roleCache = new RoleCache(Cache);
-            List<Role> roles = await roleCache.GetRolesFromCache(isAdmin, roleGroupId);
+            List<Role> roles = await roleCache.GetRolesFromCache(isAdmin);
 
             if (roles != null)
             {
@@ -46,12 +46,12 @@ namespace MoodyBudgeter.Logic.User.Roles
                 roles = await query.ToListAsync();
             }
 
-            await roleCache.AddRolesToCache(roles, isAdmin, roleGroupId);
+            await roleCache.AddRolesToCache(roles, isAdmin);
 
             return roles;
         }
 
-        public async Task<List<Role>> GetAutoRolesOnPortal()
+        public async Task<List<Role>> GetAutoRoles()
         {
             using (var uow = new UnitOfWork(Context))
             {

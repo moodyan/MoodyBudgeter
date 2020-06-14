@@ -24,7 +24,6 @@ namespace MoodyBudgeter.Utility.Repository
 
         /// <summary>
         /// This finds a record using the unique identifier of the table.
-        /// Always filter by PortalId.
         /// </summary>
         /// <param name="id">The unique identifier of the record to find.</param>
         /// <returns>A single business model.</returns>
@@ -48,7 +47,6 @@ namespace MoodyBudgeter.Utility.Repository
 
         /// <summary>
         /// Deletes a record from the database.
-        /// Be sure to always filter by the PortalId.
         /// </summary>
         /// <param name="id">The identifier of the record to delete.</param>
         public abstract Task Delete(int id);

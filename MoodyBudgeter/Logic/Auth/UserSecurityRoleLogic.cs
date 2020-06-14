@@ -18,9 +18,9 @@ namespace MoodyBudgeter.Logic.Auth
             Context = context;
         }
 
-        public async Task<List<SecurityRole>> GetSecurityRoles(int userId, bool includePortalZero)
+        public async Task<List<SecurityRole>> GetSecurityRoles(int userId)
         {
-            var userLogin = await new UserLoginLogic(Context).GetUserLogin(userId, includePortalZero);
+            var userLogin = await new UserLoginLogic(Context).GetUserLogin(userId);
 
             if (userLogin == null)
             {
@@ -37,7 +37,7 @@ namespace MoodyBudgeter.Logic.Auth
             }
         }
 
-        public async Task AddSecurityRole(int userId, SecurityRole role, string createdBy, bool includePortalZero)
+        public async Task AddSecurityRole(int userId, SecurityRole role, string createdBy)
         {
             if (userId <= 0)
             {
@@ -54,14 +54,14 @@ namespace MoodyBudgeter.Logic.Auth
                 throw new CallerException("CreatedBy required.");
             }
 
-            var userLogin = await new UserLoginLogic(Context).GetUserLogin(userId, includePortalZero);
+            var userLogin = await new UserLoginLogic(Context).GetUserLogin(userId);
 
             if (userLogin == null)
             {
                 throw new CallerException("User does not have login");
             }
 
-            var currentRoles = await GetSecurityRoles(userId, includePortalZero);
+            var currentRoles = await GetSecurityRoles(userId);
 
             if (currentRoles.Contains(role))
             {
@@ -81,9 +81,9 @@ namespace MoodyBudgeter.Logic.Auth
             }
         }
 
-        public async Task RemoveSecurityRole(int userId, SecurityRole role, bool includePortalZero)
+        public async Task RemoveSecurityRole(int userId, SecurityRole role)
         {
-            var userLogin = await new UserLoginLogic(Context).GetUserLogin(userId, includePortalZero);
+            var userLogin = await new UserLoginLogic(Context).GetUserLogin(userId);
 
             if (userLogin == null)
             {
@@ -105,16 +105,16 @@ namespace MoodyBudgeter.Logic.Auth
 
         public async Task MakeSuperUser(int userId)
         {
-            var roles = await GetSecurityRoles(userId, true);
+            var roles = await GetSecurityRoles(userId);
 
             if (!roles.Contains(SecurityRole.Admin))
             {
-                await AddSecurityRole(userId, SecurityRole.Admin, "MakeSuperUser", true);
+                await AddSecurityRole(userId, SecurityRole.Admin, "MakeSuperUser");
             }
 
             if (!roles.Contains(SecurityRole.SuperUser))
             {
-                await AddSecurityRole(userId, SecurityRole.SuperUser, "MakeSuperUser", true);
+                await AddSecurityRole(userId, SecurityRole.SuperUser, "MakeSuperUser");
             }
         }
     }

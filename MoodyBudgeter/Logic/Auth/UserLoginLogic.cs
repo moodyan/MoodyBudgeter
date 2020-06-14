@@ -17,7 +17,7 @@ namespace MoodyBudgeter.Logic.Auth
             UserCredentialLogic = new UserCredentialLogic(context);
         }
 
-        public async Task<UserCredential> GetUserLogin(int userId, bool includePortalZero = true)
+        public async Task<UserCredential> GetUserLogin(int userId)
         {
             var credential = await UserCredentialLogic.GetUserCredential(userId);
 

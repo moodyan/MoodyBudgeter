@@ -85,7 +85,7 @@ namespace MoodyBudgeter.Logic.Auth.Password
                 if (emailResult.TotalRecordCount > 1)
                 {
                     // Should this be friendly? What can we even do if this happens?
-                    // We could only check email if it marked unique (this should mean the portal is using a users real email)
+                    // We could only check email if it marked unique
                     throw new CallerException("Multiple users have this email");
                 }
 

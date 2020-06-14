@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MoodyBudgeter.Controllers.Settings
 {
-    [Route("setting/{portalid}/v1/[controller]")]
+    [Route("setting/v1/[controller]")]
     public class SettingController : BudgeterBaseController
     {
         private readonly IBudgeterCache Cache;
