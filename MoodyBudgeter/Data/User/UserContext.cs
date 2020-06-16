@@ -19,7 +19,8 @@ namespace MoodyBudgeter.Data.User
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("DBConnection"));
+                //optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("DBConnection"));
+                optionsBuilder.UseSqlServer("Data Source=WINDOWS-PCCIMCK;Initial Catalog=MoodyBudgeter; Integrated Security=false;user id=alyssa;password=alyssaTest;");
             }
         }
 
@@ -94,9 +95,6 @@ namespace MoodyBudgeter.Data.User
 
                 entity.HasIndex(e => new { e.ProfileId, e.UserId, e.PropertyValue, e.PropertyDefinitionId })
                     .HasName("IX_UserProfile_PropertyDefinitionID");
-
-                entity.HasIndex(e => new { e.PropertyDefinitionId, e.PropertyValue, e.PropertyText, e.Visibility, e.LastUpdatedDate, e.ExtendedVisibility, e.UserId, e.ProfileId })
-                    .HasName("IX_UserProfile_Visibility");
 
                 entity.Property(e => e.ProfileId).HasColumnName("ProfileID");
 

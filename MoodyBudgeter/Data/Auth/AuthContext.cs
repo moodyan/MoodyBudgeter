@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MoodyBudgeter.Utility.Clients.EnvironmentRequester;
 using System;
 
 namespace MoodyBudgeter.Data.Auth
@@ -11,7 +12,9 @@ namespace MoodyBudgeter.Data.Auth
         public virtual DbSet<AuthUserSecurityRole> UserSecurityRole { get; set; }
         public virtual DbSet<AuthUserLoginHistory> UserLoginHistory { get; set; }
 
-        public AuthContext() { }
+        public AuthContext()
+        {
+        }
 
         public AuthContext(DbContextOptions<AuthContext> options) : base(options) { }
 
@@ -19,7 +22,8 @@ namespace MoodyBudgeter.Data.Auth
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("DBConnection"));
+                //optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("DBConnection"));
+                optionsBuilder.UseSqlServer("Data Source=WINDOWS-PCCIMCK;Initial Catalog=MoodyBudgeter; Integrated Security=false;user id=alyssa;password=alyssaTest;");
             }
         }
 
