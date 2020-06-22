@@ -17,8 +17,7 @@ namespace MoodyBudgeter.Data.Settings
         {
             if (!optionsBuilder.IsConfigured)
             {
-                //optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("DBConnection"));
-                optionsBuilder.UseSqlServer("Data Source=WINDOWS-PCCIMCK;Initial Catalog=MoodyBudgeter; Integrated Security=false;user id=alyssa;password=alyssaTest;");
+                optionsBuilder.UseSqlServer(Environment.GetEnvironmentVariable("DBConnection"));
             }
         }
 
